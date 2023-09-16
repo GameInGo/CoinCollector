@@ -23,10 +23,7 @@ class MyGame(arcade.Window):
         # Call the parent class and set up the window
         super().__init__(weith, heigth, title)
 
-        # These are 'lists' that keep track of our sprites. Each sprite should
-        # go into a list.
-        self.wall_list = None
-        self.player_list = None
+        self.scene = None
 
         # Separate variable that holds the player sprite
         self.player_sprite = None
@@ -35,24 +32,27 @@ class MyGame(arcade.Window):
 
     def setup(self):
         """Set up the game here. Call this function to restart the game."""
-        # Create the Sprite lists
-        self.player_list = arcade.SpriteList()
-        self.wall_list = arcade.SpriteList(use_spatial_hash=True)
+        # Set up scene
+        self.scene = arcade.Scene()
+
+        # Add sprite lists to scene object
+        self.scene.add_sprite_list("Walls", use_spatial_hash=True)
+        self.scene.add_sprite_list("Player")
 
         # Set up the player, specifically placing it at these coordinates.
         image_source = ":resources:images/animated_characters/robot/robot_idle.png"
         self.player_sprite = arcade.Sprite(image_source, CHARACTER_SCALING)
         self.player_sprite.center_x = 64
         self.player_sprite.center_y = 128
-        self.player_list.append(self.player_sprite)
+        self.scene.add_sprite("Player", self.player_sprite)
 
         # Create the ground
         # This shows using a loop to place multiple sprites horizontally
         for x in range(0, 1250, 64):
             wall = arcade.Sprite(":resources:images/tiles/grassMid.png", TILE_SCALING)
             wall.center_x = x
-            wall.center_y = 32
-            self.wall_list.append(wall)
+            wall.center_y = 40
+            self.scene.add_sprite("Walls", wall)
 
         # Put some crates on the ground
         # This shows using a coordinate list to place sprites
@@ -64,7 +64,7 @@ class MyGame(arcade.Window):
                 ":resources:images/tiles/boxCrate_double.png", TILE_SCALING
             )
             wall.position = coordinate
-            self.wall_list.append(wall)
+            self.scene.add_sprite("Walls", wall)
 
     def on_draw(self):
         """Render the screen."""
@@ -72,9 +72,8 @@ class MyGame(arcade.Window):
         # Clear the screen to the background color
         self.clear()
 
-        # Draw our sprites
-        self.wall_list.draw()
-        self.player_list.draw()
+        # Draw all sprite lists in the scene
+        self.scene.draw()
 
 
 def main():
