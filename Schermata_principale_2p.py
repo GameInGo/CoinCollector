@@ -84,8 +84,17 @@ class MyGame(arcade.Window):
     
     
         #Create the 'physics engine'
+        #TODO: sicuro che qui si possono mettere i player uno dopo l'altro?
+        #       probabilmente vanno creati due oggetti physics_engine, uno per player
+        #       (hai letto il tutorial prima di copiare? :D)
+
+        #TODO: mai pushare codice che non funziona :D
         self.physics_engine = arcade.PhysicsEnginePlatformer(
-            self.player_sprite, self.player_sprite2, gravity_constant=GRAVITY, walls=self.scene["Walls"]
+            self.player_sprite, gravity_constant=GRAVITY, walls=self.scene["Walls"]
+        )
+
+        self.physics_engine2 = arcade.PhysicsEnginePlatformer(
+            self.player_sprite2, gravity_constant=GRAVITY, walls=self.scene["Walls"]
         )
 
 
@@ -100,18 +109,27 @@ class MyGame(arcade.Window):
         elif symbol == arcade.key.RIGHT:
             self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
 
+        elif symbol == arcade.key.W:
+            if self.physics_engine2.can_jump():
+                self.player_sprite2.change_y = PLAYER_JUMP_SPEED
+        elif symbol ==arcade.key.A:
+            self.player_sprite2.change_x = -PLAYER_MOVEMENT_SPEED
+        elif symbol == arcade.key.D:
+            self.player_sprite2.change_x = PLAYER_MOVEMENT_SPEED
+
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key."""
 
-        if key == arcade.key.UP:
-            self.player_sprite.change_y = 0
-        elif key == arcade.key.DOWN:
-            self.player_sprite.change_y = 0
-        elif key == arcade.key.LEFT:
+        if key == arcade.key.LEFT:
             self.player_sprite.change_x = 0
         elif key == arcade.key.RIGHT:
             self.player_sprite.change_x = 0
+
+        if key == arcade.key.A:
+            self.player_sprite2.change_x = 0
+        elif key == arcade.key.D:
+            self.player_sprite2.change_x = 0
     
 
     def on_update(self, delta_time: float):
@@ -119,6 +137,7 @@ class MyGame(arcade.Window):
 
         # Move the player with the physics engine
         self.physics_engine.update()
+        self.physics_engine2.update()
 
 
     def on_draw(self):
