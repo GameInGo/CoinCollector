@@ -51,7 +51,7 @@ class MyGame(arcade.Window):
         for x in range(0, 1250, 64):
             wall = arcade.Sprite(":resources:images/tiles/grassMid.png", TILE_SCALING)
             wall.center_x = x
-            wall.center_y = 40
+            wall.center_y = 32
             self.scene.add_sprite("Walls", wall)
 
         # Put some crates on the ground
