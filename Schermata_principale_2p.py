@@ -47,7 +47,7 @@ class MyGame(arcade.Window):
         self.scene.add_sprite_list("Walls", use_spatial_hash=True)
         self.scene.add_sprite_list("Player")
       
-
+        
         # Set up the player, specifically placing it at these coordinates.
         image_source = ":resources:images/animated_characters/robot/robot_idle.png"
         self.player_sprite = arcade.Sprite(image_source, CHARACTER_SCALING)
@@ -85,8 +85,9 @@ class MyGame(arcade.Window):
     
         #Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEnginePlatformer(
-            self.player_sprite, self.player_sprite2, gravity_constant=GRAVITY, walls=self.scene["Walls"]
-        )
+            self.player_sprite, gravity_constant=GRAVITY, walls=self.scene["Walls"]
+        ) 
+        #SONO SCARSO, funziona solo uno dei due se cambio self.player_sprite qui sopra con self.player_sprite2
 
 
     def on_key_press(self, symbol: int, modifiers: int):
@@ -100,6 +101,13 @@ class MyGame(arcade.Window):
         elif symbol == arcade.key.RIGHT:
             self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
 
+        if symbol == arcade.key.W:
+            if self.physics_engine.can_jump():
+                 self.player_sprite2.change_y = PLAYER_JUMP_SPEED
+        elif symbol == arcade.key.A:
+            self.player_sprite2.change_x = -PLAYER_MOVEMENT_SPEED
+        elif symbol == arcade.key.D:
+            self.player_sprite2.change_x = PLAYER_MOVEMENT_SPEED
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key."""
@@ -112,7 +120,15 @@ class MyGame(arcade.Window):
             self.player_sprite.change_x = 0
         elif key == arcade.key.RIGHT:
             self.player_sprite.change_x = 0
-    
+
+
+        if key == arcade.key.W:
+            self.player_sprite2.change_y = 0
+        elif key == arcade.key.A:
+            self.player_sprite2.change_x = 0
+        if key == arcade.key.D:
+            self.player_sprite2.change_x = 0
+
 
     def on_update(self, delta_time: float):
         """Movement and game logic"""

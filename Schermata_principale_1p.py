@@ -16,6 +16,8 @@ TILE_SCALING = 0.5
 PLAYER_MOVEMENT_SPEED = 5
 
 
+
+
 class MyGame(arcade.Window):
     """
     Main application class.
