@@ -12,6 +12,9 @@ SCREEN_TITLE = "Platformer"
 CHARACTER_SCALING = 1
 TILE_SCALING = 0.5
 
+# Movement speed of player, in pixels per frame
+PLAYER_MOVEMENT_SPEED = 5
+
 
 class MyGame(arcade.Window):
     """
@@ -38,6 +41,7 @@ class MyGame(arcade.Window):
         # Add sprite lists to scene object
         self.scene.add_sprite_list("Walls", use_spatial_hash=True)
         self.scene.add_sprite_list("Player")
+      
 
         # Set up the player, specifically placing it at these coordinates.
         image_source = ":resources:images/animated_characters/robot/robot_idle.png"
@@ -45,6 +49,8 @@ class MyGame(arcade.Window):
         self.player_sprite.center_x = 64
         self.player_sprite.center_y = 128
         self.scene.add_sprite("Player", self.player_sprite)
+
+
 
         # Create the ground
         # This shows using a loop to place multiple sprites horizontally
