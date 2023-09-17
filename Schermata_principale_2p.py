@@ -211,10 +211,16 @@ class MyGame(arcade.Window):
             screen_center_y = 0
         if screen_center_x > (self.player_sprite2.center_x - self.player_sprite2.width/2):
             screen_center_x = (self.player_sprite2.center_x - self.player_sprite2.width/2)
+            
         if self.camera.position[0] + self.camera.viewport_width < (self.player_sprite.center_x + self.player_sprite.width/2):
-            if self.player_sprite.change_x > 0 : 
+            if self.player_sprite.change_x > 0: 
                 self.player_sprite.change_x = 0
             if self.player_sprite2.change_x < 0:
+                self.player_sprite2.change_x = 0
+        if self.camera.position[0] + self.camera.viewport_width < (self.player_sprite2.center_x + self.player_sprite2.width/2):
+             if self.player_sprite.change_x < 0: 
+                self.player_sprite.change_x = 0
+             if self.player_sprite2.change_x > 0: 
                 self.player_sprite2.change_x = 0
 
         player_centered = screen_center_x, screen_center_y
