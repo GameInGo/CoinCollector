@@ -4,8 +4,8 @@ Platformer Game
 import arcade
 
 # Constants
-SCREEN_WIDTH = 1000
-SCREEN_HEIGHT = 650
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 500
 SCREEN_TITLE = "Platformer"
 
 # Constants used to scale our sprites from their original size
@@ -90,11 +90,7 @@ class MyGame(arcade.Window):
     
     
         #Create the 'physics engine'
-        #TODO: sicuro che qui si possono mettere i player uno dopo l'altro?
-        #       probabilmente vanno creati due oggetti physics_engine, uno per player
-        #       (hai letto il tutorial prima di copiare? :D)
 
-        #TODO: mai pushare codice che non funziona :D
         self.physics_engine = arcade.PhysicsEnginePlatformer(
             self.player_sprite, gravity_constant=GRAVITY, walls=self.scene["Walls"]
         )
@@ -142,13 +138,14 @@ class MyGame(arcade.Window):
 
     def on_update(self, delta_time: float):
         """Movement and game logic"""
+       
+        # Position the camera
+        self.center_camera_to_player()
 
         # Move the player with the physics engine
         self.physics_engine.update()
         self.physics_engine2.update()
 
-        # Position the camera
-        self.center_camera_to_player()
 
 
     def center_camera_to_player(self):
@@ -157,12 +154,22 @@ class MyGame(arcade.Window):
             self.camera.viewport_height / 2
         )
 
-        # Don't let camera travel past 0
+        # Don't let camera travel past 0 and players
         if screen_center_x < 0:
             screen_center_x = 0
         if screen_center_y < 0:
             screen_center_y = 0
+        if screen_center_x > (self.player_sprite2.center_x - self.player_sprite2.width/2):
+            screen_center_x = (self.player_sprite2.center_x - self.player_sprite2.width/2)
+        if self.camera.position[0] + self.camera.viewport_width < (self.player_sprite.center_x + self.player_sprite.width/2):
+            if self.player_sprite.change_x > 0 : 
+                self.player_sprite.change_x = 0
+            if self.player_sprite2.change_x < 0:
+                self.player_sprite2.change_x = 0
+
         player_centered = screen_center_x, screen_center_y
+
+        
 
         self.camera.move_to(player_centered)
 
