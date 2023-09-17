@@ -46,6 +46,13 @@ class MyGame(arcade.Window):
         #Camera
         self.camera = None
 
+        # A Camera that can be used to draw GUI elements
+        self.gui_camera = None
+
+        # Keep track of the score
+        self.score_player1 = 0
+        self.score_player2 = 0
+
         arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
 
     def setup(self):
@@ -55,6 +62,13 @@ class MyGame(arcade.Window):
 
         #Set up camera
         self.camera = arcade.Camera(self.width, self.height)
+
+        # Set up the GUI Camera
+        self.gui_camera = arcade.Camera(self.width, self.height)
+
+        # Keep track of the score
+        self.score_player1 = 0
+        self.score_player2 = 0
 
         # Add sprite lists to scene object
         self.scene.add_sprite_list("Walls", use_spatial_hash=True)
@@ -175,12 +189,14 @@ class MyGame(arcade.Window):
             coin.remove_from_sprite_lists()
             # Play a sound
             arcade.play_sound(self.collect_coin_sound)
+            self.score_player1 += 1
 
         for coin in coin_hit_list2:
             # Remove the coin
             coin.remove_from_sprite_lists()
             # Play a sound
             arcade.play_sound(self.collect_coin_sound)
+            self.score_player2 += 1
 
     def center_camera_to_player(self):
         screen_center_x = self.player_sprite.center_x - (self.camera.viewport_width / 2)
@@ -219,6 +235,27 @@ class MyGame(arcade.Window):
         # Draw all sprite lists in the scene
         self.scene.draw()
 
+        # Activate the GUI camera before drawing GUI elements
+        self.gui_camera.use()
+
+        # Draw our score on the screen, scrolling it with the viewport
+        score_text = f"Score Player 1: {self.score_player1}"
+        arcade.draw_text(
+            score_text,
+            10,
+            10,
+            arcade.csscolor.WHITE,
+            18,
+        )
+
+        score_text = f"Score Player 2: {self.score_player2}"
+        arcade.draw_text(
+            score_text,
+            600,
+            10,
+            arcade.csscolor.WHITE,
+            18,
+        )
 
 def main():
     """Main function"""
