@@ -11,6 +11,7 @@ SCREEN_TITLE = "Platformer"
 # Constants used to scale our sprites from their original size
 CHARACTER_SCALING = 1
 TILE_SCALING = 0.5
+COIN_SCALING = 0.5
 
 
 # Movement speed of player, in pixels per frame
@@ -36,6 +37,12 @@ class MyGame(arcade.Window):
         # Our pysics engine
         self.physics_engine = None
 
+        # Load sounds
+        self.collect_coin_sound = arcade.load_sound(":resources:sounds/coin1.wav")
+        self.jump_sound = arcade.load_sound(":resources:sounds/jump1.wav")
+        self.jump_sound2 = arcade.load_sound(":resources:sounds/jump2.wav")
+
+
         #Camera
         self.camera = None
 
@@ -52,7 +59,13 @@ class MyGame(arcade.Window):
         # Add sprite lists to scene object
         self.scene.add_sprite_list("Walls", use_spatial_hash=True)
         self.scene.add_sprite_list("Player")
-      
+
+        # Use a loop to place some coins for our character to pick up
+        for x in range(128, 1250, 256):
+            coin = arcade.Sprite(":resources:images/items/coinGold.png", COIN_SCALING)
+            coin.center_x = x
+            coin.center_y = 96
+            self.scene.add_sprite("Coins", coin)
         
         # Set up the player, specifically placing it at these coordinates.
         image_source = ":resources:images/animated_characters/robot/robot_idle.png"
@@ -106,6 +119,7 @@ class MyGame(arcade.Window):
         if symbol == arcade.key.UP:
             if self.physics_engine.can_jump():
                 self.player_sprite.change_y = PLAYER_JUMP_SPEED
+            arcade.play_sound(self.jump_sound)
         elif symbol ==arcade.key.LEFT:
             self.player_sprite.change_x = -PLAYER_MOVEMENT_SPEED
         elif symbol == arcade.key.RIGHT:
@@ -113,6 +127,7 @@ class MyGame(arcade.Window):
         elif symbol == arcade.key.W:
             if self.physics_engine2.can_jump():
                 self.player_sprite2.change_y = PLAYER_JUMP_SPEED
+            arcade.play_sound(self.jump_sound2)
         elif symbol ==arcade.key.A:
             self.player_sprite2.change_x = -PLAYER_MOVEMENT_SPEED
         elif symbol == arcade.key.D:
@@ -146,7 +161,26 @@ class MyGame(arcade.Window):
         self.physics_engine.update()
         self.physics_engine2.update()
 
+         # See if we hit any coins
+        coin_hit_list = arcade.check_for_collision_with_list(
+            self.player_sprite, self.scene["Coins"]
+        )
 
+        coin_hit_list2 = arcade.check_for_collision_with_list(
+            self.player_sprite2, self.scene["Coins"]
+        )
+        # Loop through each coin we hit (if any) and remove it
+        for coin in coin_hit_list:
+            # Remove the coin
+            coin.remove_from_sprite_lists()
+            # Play a sound
+            arcade.play_sound(self.collect_coin_sound)
+
+        for coin in coin_hit_list2:
+            # Remove the coin
+            coin.remove_from_sprite_lists()
+            # Play a sound
+            arcade.play_sound(self.collect_coin_sound)
 
     def center_camera_to_player(self):
         screen_center_x = self.player_sprite.center_x - (self.camera.viewport_width / 2)
