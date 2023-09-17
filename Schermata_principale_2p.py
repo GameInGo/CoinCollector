@@ -36,12 +36,18 @@ class MyGame(arcade.Window):
         # Our pysics engine
         self.physics_engine = None
 
+        #Camera
+        self.camera = None
+
         arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
 
     def setup(self):
         """Set up the game here. Call this function to restart the game."""
         # Set up scene
         self.scene = arcade.Scene()
+
+        #Set up camera
+        self.camera = arcade.Camera(self.width, self.height)
 
         # Add sprite lists to scene object
         self.scene.add_sprite_list("Walls", use_spatial_hash=True)
@@ -141,12 +147,33 @@ class MyGame(arcade.Window):
         self.physics_engine.update()
         self.physics_engine2.update()
 
+        # Position the camera
+        self.center_camera_to_player()
+
+
+    def center_camera_to_player(self):
+        screen_center_x = self.player_sprite.center_x - (self.camera.viewport_width / 2)
+        screen_center_y = self.player_sprite.center_y - (
+            self.camera.viewport_height / 2
+        )
+
+        # Don't let camera travel past 0
+        if screen_center_x < 0:
+            screen_center_x = 0
+        if screen_center_y < 0:
+            screen_center_y = 0
+        player_centered = screen_center_x, screen_center_y
+
+        self.camera.move_to(player_centered)
 
     def on_draw(self):
         """Render the screen."""
 
         # Clear the screen to the background color
         self.clear()
+
+        #Camera activation
+        self.camera.use()
 
         # Draw all sprite lists in the scene
         self.scene.draw()
