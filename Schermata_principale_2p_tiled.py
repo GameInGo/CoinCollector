@@ -9,15 +9,15 @@ SCREEN_HEIGHT = 500
 SCREEN_TITLE = "Platformer"
 
 # Constants used to scale our sprites from their original size
-CHARACTER_SCALING = 1
-TILE_SCALING = 0.5
+CHARACTER_SCALING = 0.5
+TILE_SCALING = 1.3
 COIN_SCALING = 0.5
 
 
 # Movement speed of player, in pixels per frame
-PLAYER_MOVEMENT_SPEED = 5
-GRAVITY = 1
-PLAYER_JUMP_SPEED = 20
+PLAYER_MOVEMENT_SPEED = 3
+GRAVITY = 1.3
+PLAYER_JUMP_SPEED = 15
 
 class MyGame(arcade.Window):
     """
@@ -72,7 +72,7 @@ class MyGame(arcade.Window):
         self.gui_camera = arcade.Camera(self.width, self.height)
 
         # Name of map file to load
-        map_name = "./risorse/livello1.json"
+        map_name = "./risorse/livello1_prova.json"
 
         # Layer specific options are defined based on Layer names in a dictionary
         # Doing this will make the SpriteList for the platforms layer
@@ -115,31 +115,17 @@ class MyGame(arcade.Window):
 
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEnginePlatformer(
-            self.player_sprite, gravity_constant=GRAVITY, walls=self.scene["Platforms"]
+            self.player_sprite, gravity_constant=GRAVITY, walls=self.scene["oggetti_layer"]
         )
-
-       
-        # Put some crates on the ground
-        # This shows using a coordinate list to place sprites
-        coordinate_list = [[512, 96], [256, 96], [768, 96]]
-
-        for coordinate in coordinate_list:
-            # Add a crate on the ground
-            wall = arcade.Sprite(
-                ":resources:images/tiles/boxCrate_double.png", TILE_SCALING
-            )
-            wall.position = coordinate
-            self.scene.add_sprite("Walls", wall)
     
     
         #Create the 'physics engine'
-
         self.physics_engine = arcade.PhysicsEnginePlatformer(
-            self.player_sprite, gravity_constant=GRAVITY, walls=self.scene["Walls"]
+            self.player_sprite, gravity_constant=GRAVITY, walls=self.scene["terreno"]
         )
 
         self.physics_engine2 = arcade.PhysicsEnginePlatformer(
-            self.player_sprite2, gravity_constant=GRAVITY, walls=self.scene["Walls"]
+            self.player_sprite2, gravity_constant=GRAVITY, walls=self.scene["terreno"]
         )
 
 
@@ -195,11 +181,11 @@ class MyGame(arcade.Window):
 
          # See if we hit any coins
         coin_hit_list = arcade.check_for_collision_with_list(
-            self.player_sprite, self.scene["Coins"]
+            self.player_sprite, self.scene["oggetti_layer"]
         )
 
         coin_hit_list2 = arcade.check_for_collision_with_list(
-            self.player_sprite2, self.scene["Coins"]
+            self.player_sprite2, self.scene["oggetti_layer"]
         )
         # Loop through each coin we hit (if any) and remove it
         for coin in coin_hit_list:
