@@ -211,6 +211,33 @@ class MyGame(arcade.Window):
         if key == arcade.key.D:
             self.player_sprite2.change_x = 0
 
+    def check_coin_collision(self, player_sprite : arcade.Sprite, score : int):
+        coin_hit_list = arcade.check_for_collision_with_list(player_sprite, self.scene["gettoni"])
+        
+        # Loop through each coin we hit (if any) and remove it
+        for coin in coin_hit_list:
+            # Remove the coin
+            coin.remove_from_sprite_lists()
+            # Play a sound
+            arcade.play_sound(self.collect_coin_sound)
+            score += 1
+
+    def check_restart_player(self, player_sprite : arcade.Sprite):
+        # Did the player fall off the map?
+        if player_sprite.center_y < -100:
+            player_sprite.center_x = PLAYER_START_X
+            player_sprite.center_y = PLAYER_START_Y
+
+            arcade.play_sound(self.game_over)
+
+        # Did the player touch something they should not?
+        if arcade.check_for_collision_with_list(player_sprite, self.scene[LAYER_NAME_DONT_TOUCH]):
+            player_sprite.change_x = 0
+            player_sprite.change_y = 0
+            player_sprite.center_x = PLAYER_START_X
+            player_sprite.center_y = PLAYER_START_Y
+
+            arcade.play_sound(self.game_over)
 
     def on_update(self, delta_time: float):
         """Movement and game logic"""
@@ -222,55 +249,11 @@ class MyGame(arcade.Window):
         self.physics_engine.update()
         self.physics_engine2.update()
 
-         # See if we hit any coins
-        coin_hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.scene["gettoni"])
-        coin_hit_list2 = arcade.check_for_collision_with_list(self.player_sprite2, self.scene["gettoni"])
+        self.check_coin_collision(self.player_sprite, self.score_player1)
+        self.check_coin_collision(self.player_sprite2, self.score_player2)
 
-        # Loop through each coin we hit (if any) and remove it
-        for coin in coin_hit_list:
-            # Remove the coin
-            coin.remove_from_sprite_lists()
-            # Play a sound
-            arcade.play_sound(self.collect_coin_sound)
-            self.score_player1 += 1
-
-        for coin in coin_hit_list2:
-            # Remove the coin
-            coin.remove_from_sprite_lists()
-            # Play a sound
-            arcade.play_sound(self.collect_coin_sound)
-            self.score_player2 += 1
-
-        # Did the player fall off the map?
-        if self.player_sprite.center_y < -100:
-            self.player_sprite.center_x = PLAYER_START_X
-            self.player_sprite.center_y = PLAYER_START_Y
-
-            arcade.play_sound(self.game_over)
-
-        # Did the player fall off the map?
-        if self.player_sprite2.center_y < -100:
-            self.player_sprite2.center_x = PLAYER_START_X
-            self.player_sprite2.center_y = PLAYER_START_Y
-
-            arcade.play_sound(self.game_over)
-
-        # Did the player touch something they should not?
-        if arcade.check_for_collision_with_list(self.player_sprite, self.scene[LAYER_NAME_DONT_TOUCH]):
-            self.player_sprite.change_x = 0
-            self.player_sprite.change_y = 0
-            self.player_sprite.center_x = PLAYER_START_X
-            self.player_sprite.center_y = PLAYER_START_Y
-
-            arcade.play_sound(self.game_over)
-
-        if arcade.check_for_collision_with_list(self.player_sprite2, self.scene[LAYER_NAME_DONT_TOUCH]):
-            self.player_sprite2.change_x = 0
-            self.player_sprite2.change_y = 0
-            self.player_sprite2.center_x = PLAYER_START_X
-            self.player_sprite2.center_y = PLAYER_START_Y
-
-            arcade.play_sound(self.game_over)
+        self.check_restart_player(self.player_sprite)
+        self.check_restart_player(self.player_sprite2)
 
         # See if the user got to the end of the level
         if self.player_sprite.center_x >= self.end_of_map:
