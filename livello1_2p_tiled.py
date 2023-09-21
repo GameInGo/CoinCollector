@@ -221,6 +221,8 @@ class MyGame(arcade.Window):
             # Play a sound
             arcade.play_sound(self.collect_coin_sound)
             score += 1
+            
+        return score
 
     def check_restart_player(self, player_sprite : arcade.Sprite):
         # Did the player fall off the map?
@@ -249,8 +251,8 @@ class MyGame(arcade.Window):
         self.physics_engine.update()
         self.physics_engine2.update()
 
-        self.check_coin_collision(self.player_sprite, self.score_player1)
-        self.check_coin_collision(self.player_sprite2, self.score_player2)
+        self.score_player1 = self.check_coin_collision(self.player_sprite, self.score_player1)
+        self.score_player2 = self.check_coin_collision(self.player_sprite2, self.score_player2)
 
         self.check_restart_player(self.player_sprite)
         self.check_restart_player(self.player_sprite2)
