@@ -1,6 +1,7 @@
 """
 Platformer Game
 """
+
 import arcade
 
 # Constants
@@ -25,6 +26,7 @@ LAYER_NAME_COINS = "gettoni"
 LAYER_NAME_FOREGROUND = "foreground"
 LAYER_NAME_BACKGROUND = "background"
 LAYER_NAME_DONT_TOUCH = "no_touch"
+LAYER_NAME_MOVING_PLATFORMS = "piattaforme"
 
 # Movement speed of player, in pixels per frame
 PLAYER_MOVEMENT_SPEED = 3
@@ -101,6 +103,9 @@ class MyGame(arcade.Window):
             LAYER_NAME_PLATFORMS: {
                 "use_spatial_hash": True,
             },
+            LAYER_NAME_MOVING_PLATFORMS: {
+                "use_spatial_hash": False,
+            },
             LAYER_NAME_COINS: {
                 "use_spatial_hash": True,
             },
@@ -174,7 +179,18 @@ class MyGame(arcade.Window):
         self.physics_engine2 = arcade.PhysicsEnginePlatformer(
             self.player_sprite2, gravity_constant=GRAVITY, walls=self.scene["terreno"]
         )
-
+        
+        self.physics_engine = arcade.PhysicsEnginePlatformer(
+            self.player_sprite,
+            platforms=self.scene[LAYER_NAME_MOVING_PLATFORMS],
+            gravity_constant=GRAVITY,
+            walls=self.scene[LAYER_NAME_PLATFORMS])
+        
+        self.physics_engine2 = arcade.PhysicsEnginePlatformer(
+            self.player_sprite2,
+            platforms=self.scene[LAYER_NAME_MOVING_PLATFORMS],
+            gravity_constant=GRAVITY,
+            walls=self.scene[LAYER_NAME_PLATFORMS])
 
     def on_key_press(self, symbol: int, modifiers: int):
         """ Called whenever a key is pressed """
@@ -256,6 +272,9 @@ class MyGame(arcade.Window):
 
         self.check_restart_player(self.player_sprite)
         self.check_restart_player(self.player_sprite2)
+
+        # Update walls, used with moving platforms
+        self.scene.update([LAYER_NAME_MOVING_PLATFORMS])
 
         # See if the user got to the end of the level
         if self.player_sprite.center_x >= self.end_of_map:

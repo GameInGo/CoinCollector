@@ -47,7 +47,7 @@
         }, 
         {
          "compression":"zlib",
-         "data":"eJxjYBgFo2AUjIJRMApGwSgYBcMVTBpoB4yCQQVGQnpIR8LoYqTqGwWjgN4AAN+fBF0=",
+         "data":"eJztzjEKACAMA8D+1m\/06V3FzaUVuYMsgUAiAAD4VU4f4Ck5faDB2nJ2tzvoVjdvBDk=",
          "encoding":"base64",
          "height":20,
          "id":4,
@@ -153,9 +153,48 @@
          "visible":true,
          "x":0,
          "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":7,
+         "name":"piattaforme",
+         "objects":[
+                {
+                 "gid":148,
+                 "height":18,
+                 "id":15,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"boundary_left",
+                         "type":"string",
+                         "value":"270.0"
+                        }, 
+                        {
+                         "name":"boundary_right",
+                         "type":"string",
+                         "value":"500.0"
+                        }, 
+                        {
+                         "name":"change_x",
+                         "type":"string",
+                         "value":"0.5"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":18,
+                 "x":269,
+                 "y":272
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
         }],
- "nextlayerid":7,
- "nextobjectid":15,
+ "nextlayerid":8,
+ "nextobjectid":16,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.10.2",
