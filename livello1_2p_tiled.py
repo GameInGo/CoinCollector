@@ -27,6 +27,7 @@ LAYER_NAME_FOREGROUND = "foreground"
 LAYER_NAME_BACKGROUND = "background"
 LAYER_NAME_DONT_TOUCH = "no_touch"
 LAYER_NAME_MOVING_PLATFORMS = "piattaforme"
+LAYER_NAME_LADDERS = "scale"
 
 # Movement speed of player, in pixels per frame
 PLAYER_MOVEMENT_SPEED = 3
@@ -112,6 +113,9 @@ class MyGame(arcade.Window):
             LAYER_NAME_DONT_TOUCH: {
                 "use_spatial_hash": True,
             },
+            LAYER_NAME_LADDERS: {
+                "use_spatial_hash": True,
+            },
         }
 
         # Layer specific options are defined based on Layer names in a dictionary
@@ -184,12 +188,14 @@ class MyGame(arcade.Window):
             self.player_sprite,
             platforms=self.scene[LAYER_NAME_MOVING_PLATFORMS],
             gravity_constant=GRAVITY,
+            ladders=self.scene[LAYER_NAME_LADDERS],
             walls=self.scene[LAYER_NAME_PLATFORMS])
         
         self.physics_engine2 = arcade.PhysicsEnginePlatformer(
             self.player_sprite2,
             platforms=self.scene[LAYER_NAME_MOVING_PLATFORMS],
             gravity_constant=GRAVITY,
+            ladders=self.scene[LAYER_NAME_LADDERS],
             walls=self.scene[LAYER_NAME_PLATFORMS])
 
     def on_key_press(self, symbol: int, modifiers: int):
@@ -248,7 +254,7 @@ class MyGame(arcade.Window):
 
             arcade.play_sound(self.game_over)
 
-        # Did the player touch something they should not?
+        # # Did the player touch something they should not?
         if arcade.check_for_collision_with_list(player_sprite, self.scene[LAYER_NAME_DONT_TOUCH], method=1):
             player_sprite.change_x = 0
             player_sprite.change_y = 0
