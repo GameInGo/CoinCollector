@@ -12,7 +12,7 @@ SCREEN_TITLE = "Platformer"
 CHARACTER_SCALING = 0.5
 TILE_SCALING = 1.3
 COIN_SCALING = 0.5
-SPRITE_PIXEL_SIZE = 128
+SPRITE_PIXEL_SIZE = 16
 GRID_PIXEL_SIZE = SPRITE_PIXEL_SIZE * TILE_SCALING
 
 # Player starting position
@@ -233,7 +233,7 @@ class MyGame(arcade.Window):
             arcade.play_sound(self.game_over)
 
         # Did the player touch something they should not?
-        if arcade.check_for_collision_with_list(player_sprite, self.scene[LAYER_NAME_DONT_TOUCH]):
+        if arcade.check_for_collision_with_list(player_sprite, self.scene[LAYER_NAME_DONT_TOUCH], method=1):
             player_sprite.change_x = 0
             player_sprite.change_y = 0
             player_sprite.center_x = PLAYER_START_X
