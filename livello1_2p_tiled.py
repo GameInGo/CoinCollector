@@ -3,6 +3,7 @@ Platformer Game
 """
 
 import arcade
+from PlayerCharacter import PlayerCharacter
 
 # Constants
 SCREEN_WIDTH = 800
@@ -137,7 +138,7 @@ class MyGame(arcade.Window):
 
         # Calculate the right edge of the my_map in pixels
         #TODO: GRID_PIXEL_SIZE è troppo grande come misura
-        self.end_of_map = self.tile_map.width * GRID_PIXEL_SIZE
+        self.end_of_map = self.tile_map.width * GRID_PIXEL_SIZE * 1000
 
 
         # Keep track of the score
@@ -157,14 +158,12 @@ class MyGame(arcade.Window):
         self.scene.add_sprite_list_after("Player", LAYER_NAME_FOREGROUND)
 
         # Set up the player, specifically placing it at these coordinates.
-        image_source = ":resources:images/animated_characters/robot/robot_idle.png"
-        self.player_sprite = arcade.Sprite(image_source, CHARACTER_SCALING)
+        self.player_sprite = PlayerCharacter(character="frog")
         self.player_sprite.center_x = 64
         self.player_sprite.center_y = 128
         self.scene.add_sprite("Player", self.player_sprite)
 
-        image_source = ":resources:images/animated_characters/zombie/zombie_idle.png/"
-        self.player_sprite2 = arcade.Sprite(image_source, CHARACTER_SCALING)
+        self.player_sprite2 = PlayerCharacter(character="masked")
         self.player_sprite2.center_x = self.player_sprite.center_x + self.player_sprite.width/2
         self.player_sprite2.center_y = 128
         self.scene.add_sprite("Player", self.player_sprite2)
@@ -260,9 +259,13 @@ class MyGame(arcade.Window):
         # Position the camera
         self.center_camera_to_player()
 
+        self.player_sprite.update_animation()
+        self.player_sprite2.update_animation()
+
         # Move the player with the physics engine
         self.physics_engine.update()
         self.physics_engine2.update()
+
 
         self.score_player1 = self.check_coin_collision(self.player_sprite, self.score_player1)
         self.score_player2 = self.check_coin_collision(self.player_sprite2, self.score_player2)
