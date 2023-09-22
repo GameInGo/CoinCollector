@@ -170,16 +170,7 @@ class MyGame(arcade.Window):
         if self.tile_map.background_color:
             arcade.set_background_color(self.tile_map.background_color)
     
-    
-        #Create the 'physics engine'
-        self.physics_engine = arcade.PhysicsEnginePlatformer(
-            self.player_sprite, gravity_constant=GRAVITY, walls=self.scene["terreno"]
-        )
-
-        self.physics_engine2 = arcade.PhysicsEnginePlatformer(
-            self.player_sprite2, gravity_constant=GRAVITY, walls=self.scene["terreno"]
-        )
-        
+        #Create the 'physics engine'        
         self.physics_engine = arcade.PhysicsEnginePlatformer(
             self.player_sprite,
             platforms=self.scene[LAYER_NAME_MOVING_PLATFORMS],
