@@ -88,6 +88,9 @@ class MyGame(arcade.Window):
         # Set up scene
         self.scene = arcade.Scene()
 
+        level1_sound = arcade.load_sound("./risorse/music/invitation.ogg")
+        arcade.play_sound(level1_sound, looping=True)
+
         #Set up camera
         self.camera = arcade.Camera(self.width, self.height)
 
