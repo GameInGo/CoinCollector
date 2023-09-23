@@ -234,7 +234,6 @@ class MyGame(arcade.Window):
         if player_sprite.center_y < -100:
             player_sprite.center_x = PLAYER_START_X
             player_sprite.center_y = PLAYER_START_Y
-
             arcade.play_sound(self.game_over)
 
         # # Did the player touch something they should not?
@@ -252,8 +251,8 @@ class MyGame(arcade.Window):
         # Position the camera
         self.center_camera_to_player()
 
-        self.player_sprite.update_animation()
-        self.player_sprite2.update_animation()
+        self.player_sprite.update_animation(jump_counter=self.physics_engine.jumps_since_ground)
+        self.player_sprite2.update_animation(jump_counter=self.physics_engine2.jumps_since_ground)
 
         # Move the player with the physics engine
         self.physics_engine.update()
