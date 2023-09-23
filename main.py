@@ -150,14 +150,14 @@ class MyGame(arcade.Window):
         self.scene.add_sprite_list_after("Player", LAYER_NAME_FOREGROUND)
 
         # Set up the player, specifically placing it at these coordinates.
-        self.player_sprite = PlayerCharacter(character="frog")
-        self.player_sprite.center_x = 64
-        self.player_sprite.center_y = 128
+        self.player_sprite = PlayerCharacter(character="frog",
+                                             center_x=64,
+                                             center_y=128)
         self.scene.add_sprite("Player", self.player_sprite)
 
-        self.player_sprite2 = PlayerCharacter(character="masked")
-        self.player_sprite2.center_x = self.player_sprite.center_x + self.player_sprite.width/2
-        self.player_sprite2.center_y = 128
+        self.player_sprite2 = PlayerCharacter(character="masked",
+                                              center_x=self.player_sprite.center_x + self.player_sprite.width/2,
+                                              center_y=128)
         self.scene.add_sprite("Player", self.player_sprite2)
 
         # --- Other stuff
@@ -172,6 +172,7 @@ class MyGame(arcade.Window):
             gravity_constant=GRAVITY,
             ladders=self.scene[LAYER_NAME_LADDERS],
             walls=self.scene[LAYER_NAME_PLATFORMS])
+        self.physics_engine.enable_multi_jump(2)
         
         self.physics_engine2 = arcade.PhysicsEnginePlatformer(
             self.player_sprite2,
@@ -179,12 +180,14 @@ class MyGame(arcade.Window):
             gravity_constant=GRAVITY,
             ladders=self.scene[LAYER_NAME_LADDERS],
             walls=self.scene[LAYER_NAME_PLATFORMS])
+        self.physics_engine2.enable_multi_jump(2)
 
     def on_key_press(self, symbol: int, modifiers: int):
         """ Called whenever a key is pressed """
 
         if symbol == arcade.key.UP:
             if self.physics_engine.can_jump():
+                self.physics_engine.increment_jump_counter()
                 self.player_sprite.change_y = PLAYER_JUMP_SPEED
                 arcade.play_sound(self.jump_sound)
         elif symbol == arcade.key.LEFT:
@@ -193,6 +196,7 @@ class MyGame(arcade.Window):
             self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
         elif symbol == arcade.key.W:
             if self.physics_engine2.can_jump():
+                self.physics_engine2.increment_jump_counter()
                 self.player_sprite2.change_y = PLAYER_JUMP_SPEED
                 arcade.play_sound(self.jump_sound2)
         elif symbol == arcade.key.A:

@@ -21,31 +21,30 @@ def load_texture_pair(filename):
 
 
 class PlayerCharacter(arcade.Sprite):
-    def __init__(self, character : str):
+    def __init__(self, character: str, center_x, center_y):
         # Set up parent class
         super().__init__()
+
+        self.center_x = center_x
+        self.center_y = center_y
 
         # Default to face-right
         self.character_face_direction = RIGHT_FACING
 
-
         # Used for flipping between image sequences
         self.cur_texture = 0
         self.scale = CHARACTER_SCALING
-
 
         # Adjust the collision box. Default includes too much empty space
         # side-to-side. Box is centered at sprite center, (0, 0)
         self.points = [[-22, -64], [22, -64], [22, 28], [-22, 28]]
 
         # --- Load Textures ---
-
         main_path = "./risorse/assets/"
         run = f"{character}_run/{character}_run"
         idle = f"{character}_idle/{character}_idle"
 
         # Load textures for idle standing
-
         self.idle_texture_pair = []
         for i in range(11):
             texture = load_texture_pair(f"{main_path}{idle}{i}.png")
@@ -57,22 +56,13 @@ class PlayerCharacter(arcade.Sprite):
             texture = load_texture_pair(f"{main_path}{run}{i}.png")
             self.walk_textures.append(texture)
 
-
     def update_animation(self, delta_time: float = 1 / 60):
 
-
-
         # Figure out if we need to flip face left or right
-
         if self.change_x < 0 and self.character_face_direction == RIGHT_FACING:
-
             self.character_face_direction = LEFT_FACING
-
         elif self.change_x > 0 and self.character_face_direction == LEFT_FACING:
-
             self.character_face_direction = RIGHT_FACING
-
-
 
         # Idle animation
         frame = self.cur_texture // UPDATES_PER_FRAME
