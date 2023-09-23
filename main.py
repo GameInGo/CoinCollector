@@ -39,14 +39,11 @@ class MyGame(arcade.Window):
     """
     Main application class.
     """
-
     def __init__(self, weith, heigth, title):
 
         # Call the parent class and set up the window
         super().__init__(weith, heigth, title)
-
         self.tile_map = None
-        
         self.scene = None
 
         # Separate variable that holds the player sprite
@@ -122,15 +119,6 @@ class MyGame(arcade.Window):
             },
         }
 
-        # Layer specific options are defined based on Layer names in a dictionary
-        # Doing this will make the SpriteList for the platforms layer
-        # use spatial hashing for detection.
-        layer_options = {
-            "terreno": {
-                "use_spatial_hash": True,
-            },
-        }
-
         # Read in the tiled map
         self.tile_map = arcade.load_tilemap(map_name, TILE_SCALING, layer_options)
 
@@ -140,7 +128,7 @@ class MyGame(arcade.Window):
 
 
         # Calculate the right edge of the my_map in pixels
-        #TODO: GRID_PIXEL_SIZE è troppo grande come misura
+        # TODO: GRID_PIXEL_SIZE è troppo grande come misura
         self.end_of_map = self.tile_map.width * GRID_PIXEL_SIZE * 1000
 
 
