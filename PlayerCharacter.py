@@ -43,6 +43,7 @@ class PlayerCharacter(arcade.Sprite):
         main_path = "./risorse/assets/"
         run = f"{character}_run/{character}_run"
         idle = f"{character}_idle/{character}_idle"
+        double_jump = f"{character}_double_jump/{character}_double_jump"
 
         # Load textures for idle standing
         self.idle_texture_pair = []
@@ -56,6 +57,12 @@ class PlayerCharacter(arcade.Sprite):
             texture = load_texture_pair(f"{main_path}{run}{i}.png")
             self.walk_textures.append(texture)
 
+        # Load textures for double jumping
+        self.double_jump = []
+        for i in range(6):
+            texture = load_texture_pair(f"{main_path}{double_jump}{i}.png")
+            self.double_jump.append(texture)
+
     def update_animation(self, delta_time: float = 1 / 60):
 
         # Figure out if we need to flip face left or right
@@ -68,7 +75,7 @@ class PlayerCharacter(arcade.Sprite):
         frame = self.cur_texture // UPDATES_PER_FRAME
         self.cur_texture += 1
         
-        if self.cur_texture > 10 * UPDATES_PER_FRAME:
+        if self.cur_texture > 5 * UPDATES_PER_FRAME:
             self.cur_texture = 0
 
         direction = self.character_face_direction
@@ -78,3 +85,7 @@ class PlayerCharacter(arcade.Sprite):
         else:
             # Walking animation
             self.texture = self.walk_textures[frame][direction]
+
+
+
+
