@@ -4,6 +4,7 @@ Platformer Game
 
 import arcade
 from PlayerCharacter import PlayerCharacter
+from PlayerInput import PlayerInputJoystick
 
 # Constants
 SCREEN_WIDTH = 800
@@ -66,6 +67,8 @@ class MyGame(arcade.View):
         self.jump_sound = arcade.load_sound(":resources:sounds/jump1.wav")
         self.jump_sound2 = arcade.load_sound(":resources:sounds/jump2.wav")
         self.game_over = arcade.load_sound(":resources:sounds/gameover1.wav")
+
+        self.player_input = PlayerInputJoystick()
 
         # Camera
         self.camera = None
@@ -256,6 +259,11 @@ class MyGame(arcade.View):
 
     def on_update(self, delta_time: float):
         """Movement and game logic"""
+
+        change_x, change_y = self.player_input.get_change()
+
+        self.player_sprite2.change_x = change_x * PLAYER_MOVEMENT_SPEED
+        self.player_sprite2.change_y = change_y * PLAYER_JUMP_SPEED
 
         # Position the camera
         self.center_camera_to_player()
