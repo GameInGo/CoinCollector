@@ -55,9 +55,6 @@ class MyGame(arcade.View):
         self.physics_engine = None
         self.physics_engine2 = None
 
-        # Where is the right edge of the map?
-        self.end_of_map = 0
-
         # Level
         self.level = 1
 
@@ -73,13 +70,13 @@ class MyGame(arcade.View):
         # A Camera that can be used to draw GUI elements
         self.gui_camera = None
 
-        # Do we need to reset the score?
-        self.reset_score = True
-        self.reset_score2 = True
-
         # Keep track of the score
         self.score_player1 = 0
         self.score_player2 = 0
+
+        # Do we need to reset the score?
+        self.reset_score = True
+        self.reset_score2 = True
 
         arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
 
@@ -131,10 +128,6 @@ class MyGame(arcade.View):
         # Initialize Scene with our TileMap, this will automatically add all layers
         # from the map as SpriteLists in the scene in the proper order.
         self.scene = arcade.Scene.from_tilemap(self.tile_map)
-
-        # Calculate the right edge of the my_map in pixels
-        # TODO: GRID_PIXEL_SIZE è troppo grande come misura
-        self.end_of_map = self.tile_map.width * GRID_PIXEL_SIZE * 1000
 
         # Keep track of the score, make sure we keep the score if the player finishes a level
         if self.reset_score:
@@ -229,7 +222,6 @@ class MyGame(arcade.View):
             # Play a sound
             arcade.play_sound(self.collect_coin_sound)
             score += 1
-            
         return score
 
     def check_restart_player(self, player_sprite: arcade.Sprite):
@@ -270,8 +262,8 @@ class MyGame(arcade.View):
         # Update walls, used with moving platforms
         self.scene.update([LAYER_NAME_MOVING_PLATFORMS])
 
-        # See if the user got to the end of the level
-        if self.player_sprite.center_x >= self.end_of_map:
+        # Switch to the next level
+        if len(self.scene["gettoni"]) == 0:
             # Advance to the next level
             self.level += 1
 
