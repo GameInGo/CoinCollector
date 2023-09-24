@@ -82,9 +82,11 @@ class PlayerCharacter(arcade.Sprite):
         self.double_jump = []
         self.add_animation(main_path, double_jump, "djump", self.double_jump)
 
+        # Load textures for jumping
         self.jump = []
         self.add_animation(main_path, jump, "jump", self.jump)
 
+        # Load textures for falling
         self.fall = []
         self.add_animation(main_path, fall, "fall", self.fall)
 
@@ -111,7 +113,9 @@ class PlayerCharacter(arcade.Sprite):
         elif self.change_x > 0 and self.character_face_direction == LEFT_FACING:
             self.character_face_direction = RIGHT_FACING
 
-        # Idle animation
+        direction = self.character_face_direction
+
+        # Change current animation to desired one
         if self.change_x == 0 and self.change_y == 0:
             self.change_animation("idle")
         elif self.change_x != 0 and self.change_y == 0:
@@ -123,13 +127,14 @@ class PlayerCharacter(arcade.Sprite):
         elif self.change_y < 0:
             self.change_animation("fall")
 
+        # Rationale: we update an image frame every UPDATES_PER_FRAME times the update_animation is called
+        #            the lower the UPDATES_PER_FRAME value, the faster the animation
         frame = self.cur_texture // UPDATES_PER_FRAME
         self.cur_texture += 1
 
         if self.cur_texture > (anim_dict[self.curr_anim]["max_frame"] - 1) * UPDATES_PER_FRAME:
             self.cur_texture = 0
 
-        direction = self.character_face_direction
         self.texture = self.anim_texture[frame][direction]
 
 
