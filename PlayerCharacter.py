@@ -5,7 +5,7 @@ import arcade
 RIGHT_FACING = 0
 LEFT_FACING = 1
 
-UPDATES_PER_FRAME = 5
+UPDATES_PER_FRAME = 3
 CHARACTER_SCALING = 1.5
 
 
@@ -78,6 +78,8 @@ class PlayerCharacter(arcade.Sprite):
             texture = load_texture_pair(f"{main_path}{double_jump}{i}.png")
             self.double_jump.append(texture)
 
+        self.anim_texture = self.idle_texture_pair
+
     def update_animation(self, delta_time: float = 1 / 60, jump_counter=0):
 
         # Figure out if we need to flip face left or right
@@ -91,14 +93,17 @@ class PlayerCharacter(arcade.Sprite):
             if self.curr_anim != "idle":
                 self.curr_anim = "idle"
                 self.cur_texture = 0
+                self.anim_texture = self.idle_texture_pair
         elif self.change_x != 0 and self.change_y == 0:
             if self.curr_anim != "run":
                 self.curr_anim = "run"
                 self.cur_texture = 0
+                self.anim_texture = self.walk_textures
         elif self.change_y > 0 and jump_counter == 2:
             if self.curr_anim != "djump":
                 self.curr_anim = "djump"
                 self.cur_texture = 0
+                self.anim_texture = self.double_jump
 
         frame = self.cur_texture // UPDATES_PER_FRAME
         self.cur_texture += 1
@@ -107,15 +112,7 @@ class PlayerCharacter(arcade.Sprite):
             self.cur_texture = 0
 
         direction = self.character_face_direction
-
-        # Idle animation
-        if self.change_x == 0 and self.change_y == 0:
-            self.texture = self.idle_texture_pair[frame][self.character_face_direction]
-        elif self.change_x != 0 and self.change_y == 0:
-            # Walking animation
-            self.texture = self.walk_textures[frame][direction]
-        elif self.change_y > 0 and jump_counter == 2:
-            self.texture = self.double_jump[frame][direction]
+        self.texture = self.anim_texture[frame][direction]
 
 
 
