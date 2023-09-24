@@ -156,6 +156,9 @@ class MyGame(arcade.View):
                                              walls=self.scene[LAYER_NAME_PLATFORMS])
         self.scene.add_sprite("Player", self.player_sprite)
 
+        # Per usare Player2 con WASD basta cambiare PlayerCharacterJoy con PlayerCharacter.
+        # In pratica, il parametro keymap_conf="keyboard2" determina il mapping dei tasti per
+        # il player che si sta creando. Guarda dentro file PlayerCharacter.py il dizionario 'keymap'
         self.player_sprite2 = PlayerCharacterJoy(character="masked",
                                                  keymap_conf="keyboard2",
                                                  center_x=64,
