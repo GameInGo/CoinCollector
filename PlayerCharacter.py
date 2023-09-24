@@ -18,6 +18,12 @@ anim_dict = {
     },
     "djump": {
         "max_frame": 5
+    },
+    "jump": {
+        "max_frame": 1
+    },
+    "fall": {
+        "max_frame": 1
     }
 }
 
@@ -59,26 +65,43 @@ class PlayerCharacter(arcade.Sprite):
         run = f"{character}_run/{character}_run"
         idle = f"{character}_idle/{character}_idle"
         double_jump = f"{character}_double_jump/{character}_double_jump"
+        jump = f"{character}_jump/{character}_jump"
+        fall = f"{character}_fall/{character}_fall"
+
+        self.anim_texture_map = {}
 
         # Load textures for idle standing
         self.idle_texture_pair = []
-        for i in range(11):
-            texture = load_texture_pair(f"{main_path}{idle}{i}.png")
-            self.idle_texture_pair.append(texture)
+        self.add_animation(main_path, idle, "idle", self.idle_texture_pair)
 
         # Load textures for walking
         self.walk_textures = []
-        for i in range(12):
-            texture = load_texture_pair(f"{main_path}{run}{i}.png")
-            self.walk_textures.append(texture)
+        self.add_animation(main_path, run, "run", self.walk_textures)
 
         # Load textures for double jumping
         self.double_jump = []
-        for i in range(6):
-            texture = load_texture_pair(f"{main_path}{double_jump}{i}.png")
-            self.double_jump.append(texture)
+        self.add_animation(main_path, double_jump, "djump", self.double_jump)
+
+        self.jump = []
+        self.add_animation(main_path, jump, "jump", self.jump)
+
+        self.fall = []
+        self.add_animation(main_path, fall, "fall", self.fall)
 
         self.anim_texture = self.idle_texture_pair
+
+    def add_animation(self, main_path: str, file_name: str, key: str, textures: list):
+        for i in range(anim_dict[key]["max_frame"]):
+            texture = load_texture_pair(f"{main_path}{file_name}{i}.png")
+            textures.append(texture)
+
+        self.anim_texture_map[key] = textures
+
+    def change_animation(self, desired: str):
+        if self.curr_anim != desired:
+            self.curr_anim = desired
+            self.cur_texture = 0
+            self.anim_texture = self.anim_texture_map[desired]
 
     def update_animation(self, delta_time: float = 1 / 60, jump_counter=0):
 
@@ -90,20 +113,15 @@ class PlayerCharacter(arcade.Sprite):
 
         # Idle animation
         if self.change_x == 0 and self.change_y == 0:
-            if self.curr_anim != "idle":
-                self.curr_anim = "idle"
-                self.cur_texture = 0
-                self.anim_texture = self.idle_texture_pair
+            self.change_animation("idle")
         elif self.change_x != 0 and self.change_y == 0:
-            if self.curr_anim != "run":
-                self.curr_anim = "run"
-                self.cur_texture = 0
-                self.anim_texture = self.walk_textures
+            self.change_animation("run")
+        elif self.change_y > 0 and jump_counter == 1:
+            self.change_animation("jump")
         elif self.change_y > 0 and jump_counter == 2:
-            if self.curr_anim != "djump":
-                self.curr_anim = "djump"
-                self.cur_texture = 0
-                self.anim_texture = self.double_jump
+            self.change_animation("djump")
+        elif self.change_y < 0:
+            self.change_animation("fall")
 
         frame = self.cur_texture // UPDATES_PER_FRAME
         self.cur_texture += 1
