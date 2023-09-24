@@ -36,14 +36,14 @@ GRAVITY = 1.3
 PLAYER_JUMP_SPEED = 15
 
 
-class MyGame(arcade.Window):
+class MyGame(arcade.View):
     """
     Main application class.
     """
-    def __init__(self, weith, heigth, title):
+    def __init__(self):
 
         # Call the parent class and set up the window
-        super().__init__(weith, heigth, title)
+        super().__init__()
         self.tile_map = None
         self.scene = None
 
@@ -83,6 +83,9 @@ class MyGame(arcade.Window):
 
         arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
 
+    def on_show_view(self):
+        self.setup()
+
     def setup(self):
         """Set up the game here. Call this function to restart the game."""
         # Set up scene
@@ -92,13 +95,13 @@ class MyGame(arcade.Window):
         arcade.play_sound(level1_sound, looping=True)
 
         # Set up camera
-        self.camera = arcade.Camera(self.width, self.height)
+        self.camera = arcade.Camera(self.window.width, self.window.height)
 
         # Out TileMap Object
         self.tile_map = None
 
         # Set up the GUI Camera
-        self.gui_camera = arcade.Camera(self.width, self.height)
+        self.gui_camera = arcade.Camera(self.window.width, self.window.height)
 
         # Map name
         map_name = f"./risorse/livello{self.level}.json"
@@ -346,10 +349,61 @@ class MyGame(arcade.Window):
         )
 
 
+class MainMenu(arcade.View):
+    """Class that manages the 'menu' view."""
+
+    def on_show_view(self):
+        """Called when switching to this view."""
+        arcade.set_background_color(arcade.color.WHITE)
+
+    def on_draw(self):
+        """Draw the menu"""
+        self.clear()
+        arcade.draw_text(
+            "Main Menu - Click to play",
+            SCREEN_WIDTH / 2,
+            SCREEN_HEIGHT / 2,
+            arcade.color.BLACK,
+            font_size=30,
+            anchor_x="center",
+        )
+
+    def on_mouse_press(self, _x, _y, _button, _modifiers):
+        """Use a mouse press to advance to the 'game' view."""
+        game_view = MyGame()
+        self.window.show_view(game_view)
+
+
+class GameOverView(arcade.View):
+    """Class to manage the game overview"""
+
+    def on_show_view(self):
+        """Called when switching to this view"""
+        arcade.set_background_color(arcade.color.BLACK)
+
+    def on_draw(self):
+        """Draw the game overview"""
+        self.clear()
+        arcade.draw_text(
+            "Game Over - Click to restart",
+            SCREEN_WIDTH / 2,
+            SCREEN_HEIGHT / 2,
+            arcade.color.WHITE,
+            30,
+            anchor_x="center",
+        )
+
+    def on_mouse_press(self, _x, _y, _button, _modifiers):
+        """Use a mouse press to advance to the 'game' view."""
+        game_view = MyGame()
+        self.window.show_view(game_view)
+
+
 def main():
     """Main function"""
-    window = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-    window.setup()
+    window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+    menu_view = MainMenu()
+    window.show_view(menu_view)
     arcade.run()
 
 
