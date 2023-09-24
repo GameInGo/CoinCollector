@@ -159,7 +159,7 @@ class MyGame(arcade.View):
         self.scene.add_sprite("Player", self.player_sprite)
 
         self.player_sprite2 = PlayerCharacter(character="masked",
-                                              center_x=self.player_sprite.center_x + self.player_sprite.width/2,
+                                              center_x=64,
                                               center_y=128)
         self.scene.add_sprite("Player", self.player_sprite2)
 
@@ -232,20 +232,26 @@ class MyGame(arcade.View):
             
         return score
 
-    def check_restart_player(self, player_sprite: arcade.Sprite):
+    def check_restart_player(self, player_sprite, player_sprite2):
         # Did the player fall off the map?
         if player_sprite.center_y < -100:
-            player_sprite.center_x = PLAYER_START_X
-            player_sprite.center_y = PLAYER_START_Y
+            player_sprite.center_x = player_sprite2.center_x
+            player_sprite.center_y = player_sprite2.center_y
+            arcade.play_sound(self.game_over)
+        if player_sprite2.center_y < -100:
+            player_sprite2.center_x = player_sprite.center_x
+            player_sprite2.center_y = player_sprite.center_y
             arcade.play_sound(self.game_over)
 
-        # # Did the player touch something they should not?
+        # Did the player touch something they should not?
         if arcade.check_for_collision_with_list(player_sprite, self.scene[LAYER_NAME_DONT_TOUCH], method=1):
-            player_sprite.change_x = 0
-            player_sprite.change_y = 0
-            player_sprite.center_x = PLAYER_START_X
-            player_sprite.center_y = PLAYER_START_Y
+            player_sprite.center_x = player_sprite2.center_x - 20
+            player_sprite.center_y = player_sprite2.center_y
+            arcade.play_sound(self.game_over)
 
+        if arcade.check_for_collision_with_list(player_sprite2, self.scene[LAYER_NAME_DONT_TOUCH], method=1):
+            player_sprite2.center_x = player_sprite.center_x - 20
+            player_sprite2.center_y = player_sprite.center_y
             arcade.play_sound(self.game_over)
 
     def on_update(self, delta_time: float):
@@ -264,8 +270,7 @@ class MyGame(arcade.View):
         self.score_player1 = self.check_coin_collision(self.player_sprite, self.score_player1)
         self.score_player2 = self.check_coin_collision(self.player_sprite2, self.score_player2)
 
-        self.check_restart_player(self.player_sprite)
-        self.check_restart_player(self.player_sprite2)
+        self.check_restart_player(self.player_sprite, self.player_sprite2)
 
         # Update walls, used with moving platforms
         self.scene.update([LAYER_NAME_MOVING_PLATFORMS])
@@ -360,7 +365,7 @@ class MainMenu(arcade.View):
         """Draw the menu"""
         self.clear()
         arcade.draw_text(
-            "Main Menu - Click to play",
+            "Main Menu - Click any botton to play",
             SCREEN_WIDTH / 2,
             SCREEN_HEIGHT / 2,
             arcade.color.BLACK,
@@ -368,8 +373,8 @@ class MainMenu(arcade.View):
             anchor_x="center",
         )
 
-    def on_mouse_press(self, _x, _y, _button, _modifiers):
-        """Use a mouse press to advance to the 'game' view."""
+    def on_key_press(self, _x, _y):
+        """Use any key press to start."""
         game_view = MyGame()
         self.window.show_view(game_view)
 
@@ -385,7 +390,7 @@ class GameOverView(arcade.View):
         """Draw the game overview"""
         self.clear()
         arcade.draw_text(
-            "Game Over - Click to restart",
+            "Game Over - press any key to restart",
             SCREEN_WIDTH / 2,
             SCREEN_HEIGHT / 2,
             arcade.color.WHITE,
@@ -393,8 +398,8 @@ class GameOverView(arcade.View):
             anchor_x="center",
         )
 
-    def on_mouse_press(self, _x, _y, _button, _modifiers):
-        """Use a mouse press to advance to the 'game' view."""
+    def on_key_press(self, _x, _y):
+        """Click to start the game"""
         game_view = MyGame()
         self.window.show_view(game_view)
 
