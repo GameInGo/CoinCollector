@@ -324,8 +324,8 @@ class MyMenu(arcade.View):
         self.manager = arcade.gui.UIManager()
         self.manager.enable()
 
-        # Set background color
-        arcade.set_background_color(arcade.color.DARK_BLUE_GRAY)
+        # Set background
+        self.background = arcade.load_texture("./risorse/image.png")
 
         # Create a vertical BoxGroup to align buttons
         self.v_box = arcade.gui.UIBoxLayout()
@@ -365,8 +365,8 @@ class MyMenu(arcade.View):
 
     def on_draw(self):
         self.clear()
+        arcade.draw_lrwh_rectangle_textured(0,0, SCREEN_WIDTH, SCREEN_HEIGHT, self.background)
         self.manager.draw()
-
 
 def main():
     """Main function"""
