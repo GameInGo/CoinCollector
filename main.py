@@ -3,6 +3,7 @@ Platformer Game
 """
 
 import arcade
+import arcade.gui
 from PlayerCharacter import PlayerCharacter
 
 # Constants
@@ -346,61 +347,68 @@ class MyGame(arcade.View):
         )
 
 
-class MainMenu(arcade.View):
-    """Class that manages the 'menu' view."""
+class QuitButton(arcade.gui.UIFlatButton):
+    def on_click(self, event: arcade.gui.UIOnClickEvent):
+        arcade.exit()
 
-    def on_show_view(self):
-        """Called when switching to this view."""
-        arcade.set_background_color(arcade.color.WHITE)
 
-    def on_draw(self):
-        """Draw the menu"""
-        self.clear()
-        arcade.draw_text(
-            "Main Menu - Click any botton to play",
-            SCREEN_WIDTH / 2,
-            SCREEN_HEIGHT / 2,
-            arcade.color.BLACK,
-            font_size=30,
-            anchor_x="center",
-        )
+class MyMenu(arcade.View):
+    def __init__(self):
+        super().__init__()
 
-    def on_key_press(self, _x, _y):
-        """Use any key press to start."""
+        # --- Required for all code that uses UI element,
+        # a UIManager to handle the UI.
+        self.manager = arcade.gui.UIManager()
+        self.manager.enable()
+
+        # Set background color
+        arcade.set_background_color(arcade.color.DARK_BLUE_GRAY)
+
+        # Create a vertical BoxGroup to align buttons
+        self.v_box = arcade.gui.UIBoxLayout()
+
+        # Create the buttons
+        start_button = arcade.gui.UIFlatButton(text="Start Game", width=200)
+        self.v_box.add(start_button.with_space_around(bottom=20))
+
+        settings_button = arcade.gui.UIFlatButton(text="Settings", width=200)
+        self.v_box.add(settings_button.with_space_around(bottom=20))
+
+        # Again, method 1. Use a child class to handle events.
+        quit_button = QuitButton(text="Quit", width=200)
+        self.v_box.add(quit_button)
+
+        # --- Method 2 for handling click events,
+        # assign self.on_click_start as callback
+        start_button.on_click = self.on_click_start
+
+        # --- Method 3 for handling click events,
+        # use a decorator to handle on_click events
+        @settings_button.event("on_click")
+        def on_click_settings(event):
+            print("Settings:", event)
+
+        # Create a widget to hold the v_box widget, that will center the buttons
+        self.manager.add(
+            arcade.gui.UIAnchorWidget(
+                anchor_x="center_x",
+                anchor_y="center_y",
+                child=self.v_box)
+            )
+
+    def on_click_start(self, event):
         game_view = MyGame()
         self.window.show_view(game_view)
 
-
-class GameOverView(arcade.View):
-    """Class to manage the game overview"""
-
-    def on_show_view(self):
-        """Called when switching to this view"""
-        arcade.set_background_color(arcade.color.BLACK)
-
     def on_draw(self):
-        """Draw the game overview"""
         self.clear()
-        arcade.draw_text(
-            "Game Over - press any key to restart",
-            SCREEN_WIDTH / 2,
-            SCREEN_HEIGHT / 2,
-            arcade.color.WHITE,
-            30,
-            anchor_x="center",
-        )
-
-    def on_key_press(self, _x, _y):
-        """Click to start the game"""
-        game_view = MyGame()
-        self.window.show_view(game_view)
+        self.manager.draw()
 
 
 def main():
     """Main function"""
     window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-    menu_view = MainMenu()
-    window.show_view(menu_view)
+    window.show_view(MyMenu())
     arcade.run()
 
 
