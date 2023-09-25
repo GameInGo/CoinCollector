@@ -4,7 +4,8 @@ Platformer Game
 
 import arcade
 import arcade.gui
-from PlayerCharacter import PlayerCharacter
+from PlayerCharacter import PlayerCharacter, PlayerCharacterJoy
+
 
 # Constants
 SCREEN_WIDTH = 800
@@ -12,7 +13,6 @@ SCREEN_HEIGHT = 500
 SCREEN_TITLE = "Platformer"
 
 # Constants used to scale our sprites from their original size
-CHARACTER_SCALING = 0.5
 TILE_SCALING = 1.3
 COIN_SCALING = 0.5
 SPRITE_PIXEL_SIZE = 16
@@ -34,7 +34,6 @@ LAYER_NAME_LADDERS = "scale"
 # Movement speed of player, in pixels per frame
 PLAYER_MOVEMENT_SPEED = 3
 GRAVITY = 1.3
-PLAYER_JUMP_SPEED = 15
 
 
 class MyGame(arcade.View):
@@ -51,10 +50,6 @@ class MyGame(arcade.View):
         # Separate variable that holds the player sprite
         self.player_sprite = None
         self.player_sprite2 = None
-
-        # Our pysics engine
-        self.physics_engine = None
-        self.physics_engine2 = None
 
         # Level
         self.level = 1
@@ -148,70 +143,42 @@ class MyGame(arcade.View):
 
         # Set up the player, specifically placing it at these coordinates.
         self.player_sprite = PlayerCharacter(character="frog",
+                                             keymap_conf="keyboard1",
                                              center_x=64,
-                                             center_y=128)
+                                             center_y=128,
+                                             platforms=self.scene[LAYER_NAME_MOVING_PLATFORMS],
+                                             gravity_constant=GRAVITY,
+                                             ladders=self.scene[LAYER_NAME_LADDERS],
+                                             walls=self.scene[LAYER_NAME_PLATFORMS])
         self.scene.add_sprite("Player", self.player_sprite)
 
-        self.player_sprite2 = PlayerCharacter(character="masked",
-                                              center_x=64,
-                                              center_y=128)
+        # Per usare Player2 con WASD basta cambiare PlayerCharacterJoy con PlayerCharacter.
+        # In pratica, il parametro keymap_conf="keyboard2" determina il mapping dei tasti per
+        # il player che si sta creando. Guarda dentro file PlayerCharacter.py il dizionario 'keymap'
+        self.player_sprite2 = PlayerCharacterJoy(character="masked",
+                                                 keymap_conf="keyboard2",
+                                                 center_x=64,
+                                                 center_y=128,
+                                                 platforms=self.scene[LAYER_NAME_MOVING_PLATFORMS],
+                                                 gravity_constant=GRAVITY,
+                                                 ladders=self.scene[LAYER_NAME_LADDERS],
+                                                 walls=self.scene[LAYER_NAME_PLATFORMS])
         self.scene.add_sprite("Player", self.player_sprite2)
 
         # --- Other stuff
         # Set the background color
         if self.tile_map.background_color:
             arcade.set_background_color(self.tile_map.background_color)
-    
-        # Create the 'physics engine'
-        self.physics_engine = arcade.PhysicsEnginePlatformer(
-            self.player_sprite,
-            platforms=self.scene[LAYER_NAME_MOVING_PLATFORMS],
-            gravity_constant=GRAVITY,
-            ladders=self.scene[LAYER_NAME_LADDERS],
-            walls=self.scene[LAYER_NAME_PLATFORMS])
-        self.physics_engine.enable_multi_jump(2)
-        
-        self.physics_engine2 = arcade.PhysicsEnginePlatformer(
-            self.player_sprite2,
-            platforms=self.scene[LAYER_NAME_MOVING_PLATFORMS],
-            gravity_constant=GRAVITY,
-            ladders=self.scene[LAYER_NAME_LADDERS],
-            walls=self.scene[LAYER_NAME_PLATFORMS])
-        self.physics_engine2.enable_multi_jump(2)
 
-    def on_key_press(self, symbol: int, modifiers: int):
+    def on_key_press(self, key: int, modifiers: int):
         """ Called whenever a key is pressed """
-
-        if symbol == arcade.key.UP:
-            if self.physics_engine.can_jump():
-                self.physics_engine.increment_jump_counter()
-                self.player_sprite.change_y = PLAYER_JUMP_SPEED
-                arcade.play_sound(self.jump_sound)
-        elif symbol == arcade.key.LEFT:
-            self.player_sprite.change_x = -PLAYER_MOVEMENT_SPEED
-        elif symbol == arcade.key.RIGHT:
-            self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
-        elif symbol == arcade.key.W:
-            if self.physics_engine2.can_jump():
-                self.physics_engine2.increment_jump_counter()
-                self.player_sprite2.change_y = PLAYER_JUMP_SPEED
-                arcade.play_sound(self.jump_sound2)
-        elif symbol == arcade.key.A:
-            self.player_sprite2.change_x = -PLAYER_MOVEMENT_SPEED
-        elif symbol == arcade.key.D:
-            self.player_sprite2.change_x = PLAYER_MOVEMENT_SPEED
+        self.player_sprite.notify_keypress(key)
+        self.player_sprite2.notify_keypress(key)
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key."""
-
-        if key == arcade.key.LEFT:
-            self.player_sprite.change_x = 0
-        elif key == arcade.key.RIGHT:
-            self.player_sprite.change_x = 0
-        elif key == arcade.key.A:
-            self.player_sprite2.change_x = 0
-        if key == arcade.key.D:
-            self.player_sprite2.change_x = 0
+        self.player_sprite.notify_keyrelease(key)
+        self.player_sprite2.notify_keyrelease(key)
 
     def check_coin_collision(self, player_sprite: arcade.Sprite, score: int):
         coin_hit_list = arcade.check_for_collision_with_list(player_sprite, self.scene["gettoni"])
@@ -253,12 +220,8 @@ class MyGame(arcade.View):
         # Position the camera
         self.center_camera_to_player()
 
-        self.player_sprite.update_animation(jump_counter=self.physics_engine.jumps_since_ground)
-        self.player_sprite2.update_animation(jump_counter=self.physics_engine2.jumps_since_ground)
-
-        # Move the player with the physics engine
-        self.physics_engine.update()
-        self.physics_engine2.update()
+        self.player_sprite.update_character()
+        self.player_sprite2.update_character()
 
         self.score_player1 = self.check_coin_collision(self.player_sprite, self.score_player1)
         self.score_player2 = self.check_coin_collision(self.player_sprite2, self.score_player2)
