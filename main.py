@@ -97,7 +97,7 @@ class MyGame(arcade.View):
         self.gui_camera = arcade.Camera(self.window.width, self.window.height)
 
         # Map name
-        map_name = f"./risorse/livello{self.level}.json"
+        map_name = f"./risorse/maps/livello{self.level}.json"
 
         # Layer Specific Options for the Tilemap
         layer_options = {

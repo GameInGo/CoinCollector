@@ -136,8 +136,10 @@ class PlayerCharacter(arcade.Sprite):
 
     def notify_keypress(self, pressed_key):
         if pressed_key == keymap[self.keymap_conf]["up"]:
-            if self.can_jump():
-                self.character_jump()
+            if self.physics_engine.is_on_ladder():
+                self.change_y = PLAYER_MOVEMENT_SPEED
+            elif self.can_jump():
+                self.physics_engine.jump(PLAYER_JUMP_SPEED)
                 arcade.play_sound(self.jump_sound)
         elif pressed_key == keymap[self.keymap_conf]["left"]:
             self.change_x = -PLAYER_MOVEMENT_SPEED
@@ -145,6 +147,8 @@ class PlayerCharacter(arcade.Sprite):
             self.change_x = PLAYER_MOVEMENT_SPEED
 
     def notify_keyrelease(self, released_key):
+        if released_key == keymap[self.keymap_conf]["up"] and self.physics_engine.is_on_ladder():
+            self.change_y = 0
         if released_key == keymap[self.keymap_conf]["left"]:
             self.change_x = 0
         elif released_key == keymap[self.keymap_conf]["right"]:
@@ -152,10 +156,6 @@ class PlayerCharacter(arcade.Sprite):
 
     def can_jump(self):
         return self.physics_engine.can_jump()
-
-    def character_jump(self):
-        self.physics_engine.increment_jump_counter()
-        self.change_y = PLAYER_JUMP_SPEED
 
     def update_character(self):
         self.update_animation()
@@ -179,9 +179,9 @@ class PlayerCharacter(arcade.Sprite):
             self.change_animation("idle")
         elif self.change_x != 0 and self.change_y == 0:
             self.change_animation("run")
-        elif self.change_y > 0 and self.physics_engine.jumps_since_ground == 1:
+        elif self.change_y > 0 and self.physics_engine.jumps_since_ground == 1 and not self.physics_engine.is_on_ladder():
             self.change_animation("jump")
-        elif self.change_y > 0 and self.physics_engine.jumps_since_ground == 2:
+        elif self.change_y > 0 and self.physics_engine.jumps_since_ground == 2 and not self.physics_engine.is_on_ladder():
             self.change_animation("djump")
         elif self.change_y < 0:
             self.change_animation("fall")
@@ -235,12 +235,15 @@ class PlayerCharacterJoy(PlayerCharacter):
     def on_joybutton_press(self, _joystick, button):
         """ Handle button-down event for the joystick """
         if button == 0:
-            if self.can_jump():
-                self.character_jump()
+            if self.physics_engine.is_on_ladder():
+                self.change_y = PLAYER_MOVEMENT_SPEED
+            elif self.can_jump():
+                self.physics_engine.jump(PLAYER_JUMP_SPEED)
                 arcade.play_sound(self.jump_sound)
 
     def on_joybutton_release(self, _joystick, button):
-        return
+        if button == 0 and self.physics_engine.is_on_ladder():
+            self.change_y = 0
 
     def on_joyhat_motion(self, _joystick, hat_x, hat_y):
         return
