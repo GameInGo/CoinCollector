@@ -5,7 +5,7 @@ Platformer Game
 import arcade
 import arcade.gui
 from PlayerCharacter import PlayerCharacter, PlayerCharacterJoy
-
+import MyMenu
 
 # Constants
 SCREEN_WIDTH = 800
@@ -155,7 +155,11 @@ class MyGame(arcade.View):
         # Per usare Player2 con WASD basta cambiare PlayerCharacterJoy con PlayerCharacter.
         # In pratica, il parametro keymap_conf="keyboard2" determina il mapping dei tasti per
         # il player che si sta creando. Guarda dentro file PlayerCharacter.py il dizionario 'keymap'
-        self.player_sprite2 = PlayerCharacterJoy(character="masked",
+        f = open("input_conf.txt", "r")
+        line = f.readline()
+
+        if line == "joypad":
+            self.player_sprite2 = PlayerCharacterJoy(character="masked",
                                                  keymap_conf="keyboard2",
                                                  center_x=64,
                                                  center_y=128,
@@ -163,7 +167,17 @@ class MyGame(arcade.View):
                                                  gravity_constant=GRAVITY,
                                                  ladders=self.scene[LAYER_NAME_LADDERS],
                                                  walls=self.scene[LAYER_NAME_PLATFORMS])
-        self.scene.add_sprite("Player", self.player_sprite2)
+            self.scene.add_sprite("Player", self.player_sprite2)
+        else:
+            self.player_sprite2 = PlayerCharacter(character="masked",
+                                                     keymap_conf="keyboard2",
+                                                     center_x=64,
+                                                     center_y=128,
+                                                     platforms=self.scene[LAYER_NAME_MOVING_PLATFORMS],
+                                                     gravity_constant=GRAVITY,
+                                                     ladders=self.scene[LAYER_NAME_LADDERS],
+                                                     walls=self.scene[LAYER_NAME_PLATFORMS])
+            self.scene.add_sprite("Player", self.player_sprite2)
 
         # --- Other stuff
         # Set the background color
@@ -310,68 +324,10 @@ class MyGame(arcade.View):
         )
 
 
-class QuitButton(arcade.gui.UIFlatButton):
-    def on_click(self, event: arcade.gui.UIOnClickEvent):
-        arcade.exit()
-
-
-class MyMenu(arcade.View):
-    def __init__(self):
-        super().__init__()
-
-        # --- Required for all code that uses UI element,
-        # a UIManager to handle the UI.
-        self.manager = arcade.gui.UIManager()
-        self.manager.enable()
-
-        # Set background
-        self.background = arcade.load_texture("./risorse/image.png")
-
-        # Create a vertical BoxGroup to align buttons
-        self.v_box = arcade.gui.UIBoxLayout()
-
-        # Create the buttons
-        start_button = arcade.gui.UIFlatButton(text="Start Game", width=200)
-        self.v_box.add(start_button.with_space_around(bottom=20))
-
-        settings_button = arcade.gui.UIFlatButton(text="Settings", width=200)
-        self.v_box.add(settings_button.with_space_around(bottom=20))
-
-        # Again, method 1. Use a child class to handle events.
-        quit_button = QuitButton(text="Quit", width=200)
-        self.v_box.add(quit_button)
-
-        # --- Method 2 for handling click events,
-        # assign self.on_click_start as callback
-        start_button.on_click = self.on_click_start
-
-        # --- Method 3 for handling click events,
-        # use a decorator to handle on_click events
-        @settings_button.event("on_click")
-        def on_click_settings(event):
-            print("Settings:", event)
-
-        # Create a widget to hold the v_box widget, that will center the buttons
-        self.manager.add(
-            arcade.gui.UIAnchorWidget(
-                anchor_x="center_x",
-                anchor_y="center_y",
-                child=self.v_box)
-            )
-
-    def on_click_start(self, event):
-        game_view = MyGame()
-        self.window.show_view(game_view)
-
-    def on_draw(self):
-        self.clear()
-        arcade.draw_lrwh_rectangle_textured(0,0, SCREEN_WIDTH, SCREEN_HEIGHT, self.background)
-        self.manager.draw()
-
 def main():
     """Main function"""
     window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-    window.show_view(MyMenu())
+    window.show_view(MyMenu.MyMenu())
     arcade.run()
 
 
