@@ -222,7 +222,7 @@ class MyGame(arcade.View):
 
     def check_coin_collision(self, player_sprite: arcade.Sprite, score: int):
         coin_hit_list = arcade.check_for_collision_with_list(player_sprite, self.scene["gettoni"])
-        
+
         # Loop through each coin we hit (if any) and remove it
         for coin in coin_hit_list:
             # Remove the coin
@@ -273,7 +273,6 @@ class MyGame(arcade.View):
             final_offset = offset + (jump + frame) * sprite.width
             sprite.left = final_offset
             sprite.bottom = camera_y
-            print(final_offset)
 
         self.score_player1 = self.check_coin_collision(self.player_sprite, self.score_player1)
         self.score_player2 = self.check_coin_collision(self.player_sprite2, self.score_player2)
@@ -293,9 +292,8 @@ class MyGame(arcade.View):
 
             # start from mymenu when levels are finished
             if self.level == 3:
-                 self.window.show_view(MyMenu.MyMenu()) 
+                 self.window.show_view(MyMenu.MyMenu())
                  return
-            print (self.level)
 
 
             # Make sure to keep the score from this level when setting up the next level
@@ -314,16 +312,16 @@ class MyGame(arcade.View):
         if screen_center_y < 0:
             screen_center_y = 0
         if screen_center_x > (self.player_sprite2.center_x - self.player_sprite2.width/2):
-            screen_center_x = (self.player_sprite2.center_x - self.player_sprite2.width/2) 
+            screen_center_x = (self.player_sprite2.center_x - self.player_sprite2.width/2)
 
         if (self.camera.position[0] + self.camera.viewport_width <
                 (self.player_sprite.center_x + self.player_sprite.width/2)):
-            if self.player_sprite.change_x > 0: 
+            if self.player_sprite.change_x > 0:
                 self.player_sprite.change_x = 0
             if self.player_sprite2.change_x < 0:
                 self.player_sprite2.change_x = 0
         if self.camera.position[0] > (self.player_sprite.center_x - self.player_sprite.width/2):
-            if self.player_sprite.change_x < 0: 
+            if self.player_sprite.change_x < 0:
                 self.player_sprite.change_x = 0
         if (self.camera.position[0] + self.camera.viewport_width <
                 (self.player_sprite2.center_x + self.player_sprite2.width/2)):
