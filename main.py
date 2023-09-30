@@ -261,6 +261,16 @@ class MyGame(arcade.View):
             # Advance to the next level
             self.level += 1
 
+            # stop music when a new level is generated
+            arcade.stop_sound(self.player_sound)
+
+            # start from mymenu when levels are finished
+            if self.level == 3:
+                 self.window.show_view(MyMenu.MyMenu()) 
+                 return
+            print (self.level)
+
+
             # Make sure to keep the score from this level when setting up the next level
             self.reset_score = False
 
