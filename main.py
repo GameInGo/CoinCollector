@@ -63,6 +63,8 @@ class MyGame(arcade.View):
         self.jump_sound2 = arcade.load_sound(":resources:sounds/jump2.wav")
         self.game_over = arcade.load_sound(":resources:sounds/gameover1.wav")
 
+        self.backgrounds = arcade.SpriteList()
+
         # Camera
         self.camera = None
 
@@ -83,6 +85,19 @@ class MyGame(arcade.View):
         self.setup()
 
     def setup(self):
+
+        image = "./risorse/sfondi/Glacial_mountains.png"
+
+        sprite = arcade.Sprite(image, scale=3)
+        sprite.bottom = 0
+        sprite.left = 0
+        self.backgrounds.append(sprite)
+
+        sprite2 = arcade.Sprite(image, scale=3)
+        sprite2.bottom = 0
+        sprite2.left = sprite2.width
+        self.backgrounds.append(sprite2)
+
         """Set up the game here. Call this function to restart the game."""
         # Set up scene
         self.scene = arcade.Scene()
@@ -164,16 +179,6 @@ class MyGame(arcade.View):
 
         if line == "joypad\n":
             self.player_sprite2 = PlayerCharacterJoy(character="masked",
-                                                 keymap_conf="keyboard2",
-                                                 center_x=64,
-                                                 center_y=128,
-                                                 platforms=self.scene[LAYER_NAME_MOVING_PLATFORMS],
-                                                 gravity_constant=GRAVITY,
-                                                 ladders=self.scene[LAYER_NAME_LADDERS],
-                                                 walls=self.scene[LAYER_NAME_PLATFORMS])
-            self.scene.add_sprite("Player", self.player_sprite2)
-        else:
-            self.player_sprite2 = PlayerCharacter(character="masked",
                                                      keymap_conf="keyboard2",
                                                      center_x=64,
                                                      center_y=128,
@@ -181,6 +186,16 @@ class MyGame(arcade.View):
                                                      gravity_constant=GRAVITY,
                                                      ladders=self.scene[LAYER_NAME_LADDERS],
                                                      walls=self.scene[LAYER_NAME_PLATFORMS])
+            self.scene.add_sprite("Player", self.player_sprite2)
+        else:
+            self.player_sprite2 = PlayerCharacter(character="masked",
+                                                  keymap_conf="keyboard2",
+                                                  center_x=64,
+                                                  center_y=128,
+                                                  platforms=self.scene[LAYER_NAME_MOVING_PLATFORMS],
+                                                  gravity_constant=GRAVITY,
+                                                  ladders=self.scene[LAYER_NAME_LADDERS],
+                                                  walls=self.scene[LAYER_NAME_PLATFORMS])
             self.scene.add_sprite("Player", self.player_sprite2)
 
         # --- Other stuff
@@ -242,11 +257,23 @@ class MyGame(arcade.View):
     def on_update(self, delta_time: float):
         """Movement and game logic"""
 
+        self.player_sprite.update_character()
+        self.player_sprite2.update_character()
+
         # Position the camera
         self.center_camera_to_player()
 
-        self.player_sprite.update_character()
-        self.player_sprite2.update_character()
+        camera_x = self.camera.position[0]
+        camera_y = self.camera.position[1]
+        for count, sprite in enumerate(self.backgrounds):
+            layer = count // 2
+            frame = count % 2
+            offset = camera_x / (2 ** (layer + 1))
+            jump = (camera_x - offset) // sprite.width
+            final_offset = offset + (jump + frame) * sprite.width
+            sprite.left = final_offset
+            sprite.bottom = camera_y
+            print(final_offset)
 
         self.score_player1 = self.check_coin_collision(self.player_sprite, self.score_player1)
         self.score_player2 = self.check_coin_collision(self.player_sprite2, self.score_player2)
@@ -306,8 +333,11 @@ class MyGame(arcade.View):
         # Clear the screen to the background color
         self.clear()
 
+
         # Camera activation
         self.camera.use()
+
+        self.backgrounds.draw(pixelated=True)
 
         # Draw all sprite lists in the scene
         self.scene.draw()
