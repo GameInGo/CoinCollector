@@ -44,6 +44,8 @@ class MyGame(arcade.View):
 
         # Call the parent class and set up the window
         super().__init__()
+        self.fresh_start = True
+
         self.tile_map = None
         self.scene = None
 
@@ -53,6 +55,7 @@ class MyGame(arcade.View):
 
         # Level
         self.level = 1
+        self.player = "P1"
 
         # Load sounds
         self.collect_coin_sound = arcade.load_sound(":resources:sounds/coin1.wav")
@@ -84,8 +87,8 @@ class MyGame(arcade.View):
         # Set up scene
         self.scene = arcade.Scene()
 
-        level1_sound = arcade.load_sound("./risorse/music/invitation.ogg")
-        self.player_sound= arcade.play_sound(level1_sound, looping=True)
+        self.level1_sound = arcade.load_sound("./risorse/music/invitation.ogg")
+        self.player_sound = self.player_sound= arcade.play_sound(self.level1_sound, looping=True)
 
         # Set up camera
         self.camera = arcade.Camera(self.window.width, self.window.height)
@@ -157,8 +160,9 @@ class MyGame(arcade.View):
         # il player che si sta creando. Guarda dentro file PlayerCharacter.py il dizionario 'keymap'
         f = open("input_conf.txt", "r")
         line = f.readline()
+        self.player = f.readline()
 
-        if line == "joypad":
+        if line == "joypad\n":
             self.player_sprite2 = PlayerCharacterJoy(character="masked",
                                                  keymap_conf="keyboard2",
                                                  center_x=64,

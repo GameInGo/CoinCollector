@@ -71,7 +71,9 @@ class SettingsMenu(arcade.View):
 
         arcade.set_background_color((127, 127, 127))
 
+        self.v_box = arcade.gui.UIBoxLayout()
         self.h_box = arcade.gui.UIBoxLayout(vertical=False)
+        self.player_selection = arcade.gui.UIBoxLayout(vertical=False)
 
         keyboard_button = arcade.gui.UIFlatButton(text="Keyboard", width=200)
         self.h_box.add(keyboard_button.with_space_around(right=20))
@@ -79,25 +81,40 @@ class SettingsMenu(arcade.View):
         joy_button = arcade.gui.UIFlatButton(text="Joystick", width=200)
         self.h_box.add(joy_button)
 
+        p1_button = arcade.gui.UIFlatButton(text="P1", width=200)
+        self.player_selection.add(p1_button.with_space_around(right=20))
+
+        p2_button = arcade.gui.UIFlatButton(text="P2", width=200)
+        self.player_selection.add(p2_button)
+
+        save_button = arcade.gui.UIFlatButton(text="Save", width=200)
+
+        self.v_box.add(self.h_box.with_space_around(bottom=20))
+        self.v_box.add(self.player_selection.with_space_around(bottom=20))
+        self.v_box.add(save_button)
+
+        self.controls_choice = "keyboard2\n"
+        self.player_choice = "P1\n"
+
         @keyboard_button.event("on_click")
         def on_click_keyboard(event):
             print("Keyboard selected")
-
-            f = open("input_conf.txt", "w")
-            f.write("keyboard2")
-            f.close()
-
-            self.window.show_view(MyMenu())
+            self.controls_choice = "keyboard2\n"
 
         @joy_button.event("on_click")
         def on_click_joy(event):
             print("Joystick selected")
+            self.controls_choice = "joypad\n"
 
-            f = open("input_conf.txt", "w")
-            f.write("joypad")
-            f.close()
+        @p1_button.event("on_click")
+        def on_click_p1(event):
+            print("Playing as P1")
+            self.player_choice = "P1\n"
 
-            self.window.show_view(MyMenu())
+        @p2_button.event("on_click")
+        def on_click_p2(event):
+            print("Playing as P2")
+            self.player_choice = "P2\n"
 
         self.manager.add(
             arcade.gui.UIAnchorWidget(
@@ -106,6 +123,22 @@ class SettingsMenu(arcade.View):
                 child=self.h_box
             )
         )
+
+        self.manager.add(
+            arcade.gui.UIAnchorWidget(
+                anchor_x="center_x",
+                anchor_y="center_y",
+                child=self.v_box
+            )
+        )
+
+        @save_button.event("on_click")
+        def save_conf(event):
+            f = open("input_conf.txt", "w")
+            f.write(self.controls_choice)
+            f.write(self.player_choice)
+            f.close()
+            self.window.show_view(MyMenu())
 
     def on_draw(self):
         self.clear()
