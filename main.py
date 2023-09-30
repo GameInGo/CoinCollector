@@ -85,7 +85,7 @@ class MyGame(arcade.View):
         self.scene = arcade.Scene()
 
         level1_sound = arcade.load_sound("./risorse/music/invitation.ogg")
-        arcade.play_sound(level1_sound, looping=True)
+        self.player_sound= arcade.play_sound(level1_sound, looping=True)
 
         # Set up camera
         self.camera = arcade.Camera(self.window.width, self.window.height)
@@ -188,6 +188,13 @@ class MyGame(arcade.View):
         """ Called whenever a key is pressed """
         self.player_sprite.notify_keypress(key)
         self.player_sprite2.notify_keypress(key)
+        if key == arcade.key.ESCAPE:
+            arcade.stop_sound(self.player_sound)
+            self.window.show_view(
+               MyMenu.MyMenu()
+            )
+
+
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key."""
