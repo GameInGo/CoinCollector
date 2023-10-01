@@ -1,9 +1,12 @@
 """
 Platformer Game
 """
+import threading
 
 import arcade
 import arcade.gui
+from python_banyan.banyan_base import BanyanBase
+
 from PlayerCharacter import PlayerCharacter, PlayerCharacterJoy
 import MyMenu
 
@@ -36,15 +39,22 @@ PLAYER_MOVEMENT_SPEED = 3
 GRAVITY = 1.3
 
 
-class MyGame(arcade.View):
+class MyGame(arcade.View, threading.Thread, BanyanBase):
     """
     Main application class.
     """
     def __init__(self):
 
+        self.event = threading.Event()
+
         # Call the parent class and set up the window
-        super().__init__()
+        arcade.View.__init__(self)
+        threading.Thread.__init__(self)
+        BanyanBase.__init__(self, back_plane_ip_address=None,
+                            process_name="MyGame", loop_time=.001)
+
         self.fresh_start = True
+        self.topic = None
 
         self.tile_map = None
         self.scene = None
@@ -177,6 +187,7 @@ class MyGame(arcade.View):
         line = f.readline()
         self.player = f.readline()
 
+        player_control = None
         if line == "joypad\n":
             self.player_sprite2 = PlayerCharacterJoy(character="masked",
                                                      keymap_conf="keyboard2",
@@ -203,17 +214,22 @@ class MyGame(arcade.View):
         if self.tile_map.background_color:
             arcade.set_background_color(self.tile_map.background_color)
 
+        self.topic = "P1" if self.player == "P1\n" else "P2"
+
+        if self.fresh_start:
+            self.start()
+            self.fresh_start = False
+            self.set_subscriber_topic("P1" if self.player == "P2\n" else "P2")
+
     def on_key_press(self, key: int, modifiers: int):
         """ Called whenever a key is pressed """
         self.player_sprite.notify_keypress(key)
         self.player_sprite2.notify_keypress(key)
+
         if key == arcade.key.ESCAPE:
             arcade.stop_sound(self.player_sound)
-            self.window.show_view(
-               MyMenu.MyMenu()
-            )
-
-
+            self.clean_up()
+            self.window.show_view(MyMenu.MyMenu())
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key."""
@@ -254,11 +270,32 @@ class MyGame(arcade.View):
             player_sprite2.center_y = player_sprite.center_y
             arcade.play_sound(self.game_over)
 
+    def run(self):
+        self.receive_loop()
+
+    def incoming_message_processing(self, topic, payload):
+        if self.external_message_processor:
+            self.external_message_processor(topic, payload)
+
+        print(f"Received a message on topic [{topic}] -- [{payload}]")
+
+        if topic == "P1":
+            self.player_sprite.center_x = payload["x"]
+            self.player_sprite.center_y = payload["y"]
+        else:
+            self.player_sprite2.center_x = payload["x"]
+            self.player_sprite2.center_y = payload["y"]
+
     def on_update(self, delta_time: float):
         """Movement and game logic"""
 
         self.player_sprite.update_character()
         self.player_sprite2.update_character()
+
+        payload = {"x": self.player_sprite.center_x, "y": self.player_sprite.center_y} if self.player == "P1\n" else\
+            {"x": self.player_sprite2.center_x, "y": self.player_sprite2.center_y}
+        print(f"Publishing on topic {self.topic} -- [{payload}]")
+        self.publish_payload(payload, self.topic)
 
         # Position the camera
         self.center_camera_to_player()
@@ -292,9 +329,8 @@ class MyGame(arcade.View):
 
             # start from mymenu when levels are finished
             if self.level == 3:
-                 self.window.show_view(MyMenu.MyMenu())
-                 return
-
+                self.window.show_view(MyMenu.MyMenu())
+                return
 
             # Make sure to keep the score from this level when setting up the next level
             self.reset_score = False
