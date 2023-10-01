@@ -65,7 +65,7 @@ class PlayerCharacter(arcade.Sprite):
     def __init__(self, character: str, keymap_conf: str, center_x, center_y, platforms, gravity_constant, ladders, walls):
         # Set up parent class
         super().__init__()
-
+        self.last_pos = (center_x, center_y)
         self.jump_sound = arcade.load_sound(":resources:sounds/jump1.wav")
 
         self.keymap_conf = keymap_conf
@@ -120,6 +120,13 @@ class PlayerCharacter(arcade.Sprite):
         self.add_animation(main_path, fall, "fall", self.fall)
 
         self.anim_texture = self.idle_texture_pair
+
+    def update_checkpoint(self, x, y):
+        self.last_pos = (x, y)
+
+    def respawn(self):
+        self.center_x = self.last_pos[0]
+        self.center_y = self.last_pos[1]
 
     def add_animation(self, main_path: str, file_name: str, key: str, textures: list):
         for i in range(anim_dict[key]["max_frame"]):

@@ -14,6 +14,8 @@ import MyMenu
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 500
 SCREEN_TITLE = "Platformer"
+STARTING_X = 64
+STARTING_Y = 128
 
 # Constants used to scale our sprites from their original size
 TILE_SCALING = 1.3
@@ -172,8 +174,8 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
         # Set up the player, specifically placing it at these coordinates.
         self.player_sprite = PlayerCharacter(character="frog",
                                              keymap_conf="keyboard1",
-                                             center_x=64,
-                                             center_y=128,
+                                             center_x=STARTING_X,
+                                             center_y=STARTING_Y,
                                              platforms=self.scene[LAYER_NAME_MOVING_PLATFORMS],
                                              gravity_constant=GRAVITY,
                                              ladders=self.scene[LAYER_NAME_LADDERS],
@@ -191,8 +193,8 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
         if line == "joypad\n":
             self.player_sprite2 = PlayerCharacterJoy(character="masked",
                                                      keymap_conf="keyboard2",
-                                                     center_x=64,
-                                                     center_y=128,
+                                                     center_x=STARTING_X,
+                                                     center_y=STARTING_Y,
                                                      platforms=self.scene[LAYER_NAME_MOVING_PLATFORMS],
                                                      gravity_constant=GRAVITY,
                                                      ladders=self.scene[LAYER_NAME_LADDERS],
@@ -201,8 +203,8 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
         else:
             self.player_sprite2 = PlayerCharacter(character="masked",
                                                   keymap_conf="keyboard2",
-                                                  center_x=64,
-                                                  center_y=128,
+                                                  center_x=STARTING_X,
+                                                  center_y=STARTING_Y,
                                                   platforms=self.scene[LAYER_NAME_MOVING_PLATFORMS],
                                                   gravity_constant=GRAVITY,
                                                   ladders=self.scene[LAYER_NAME_LADDERS],
@@ -248,26 +250,37 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
             score += 1
         return score
 
-    def check_restart_player(self, player_sprite, player_sprite2):
+    def check_button_collision(self, player_sprite: arcade.Sprite):
+        button_hit_list = arcade.check_for_collision_with_list(player_sprite, self.scene["attivabili"])
+
+        for button in button_hit_list:
+            piattaforma = button.properties["piattaforma"]
+            for platform in self.scene["piattaforme"]:
+                if platform.properties["attivabile"] == piattaforma:
+                    platform.change_x = 0.5
+                    self.scene["attivabili"].remove(button)
+                    self.scene["foreground"].append(button)
+
+    def check_checkpoint_collision(self, player_sprite: PlayerCharacter):
+        if arcade.check_for_collision_with_list(player_sprite, self.scene["checkpoint"]):
+            player_sprite.update_checkpoint(player_sprite.center_x, player_sprite.center_y)
+
+    def check_restart_player(self, player_sprite: PlayerCharacter, player_sprite2: PlayerCharacter):
         # Did the player fall off the map?
         if player_sprite.center_y < -100:
-            player_sprite.center_x = player_sprite2.center_x
-            player_sprite.center_y = player_sprite2.center_y
+            player_sprite.respawn()
             arcade.play_sound(self.game_over)
         if player_sprite2.center_y < -100:
-            player_sprite2.center_x = player_sprite.center_x
-            player_sprite2.center_y = player_sprite.center_y
+            player_sprite2.respawn()
             arcade.play_sound(self.game_over)
 
         # Did the player touch something they should not?
         if arcade.check_for_collision_with_list(player_sprite, self.scene[LAYER_NAME_DONT_TOUCH], method=1):
-            player_sprite.center_x = player_sprite2.center_x - 20
-            player_sprite.center_y = player_sprite2.center_y
+            player_sprite.respawn()
             arcade.play_sound(self.game_over)
 
         if arcade.check_for_collision_with_list(player_sprite2, self.scene[LAYER_NAME_DONT_TOUCH], method=1):
-            player_sprite2.center_x = player_sprite.center_x - 20
-            player_sprite2.center_y = player_sprite.center_y
+            player_sprite2.respawn()
             arcade.play_sound(self.game_over)
 
     def run(self):
@@ -313,6 +326,10 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
 
         self.score_player1 = self.check_coin_collision(self.player_sprite, self.score_player1)
         self.score_player2 = self.check_coin_collision(self.player_sprite2, self.score_player2)
+        self.check_button_collision(self.player_sprite)
+        self.check_button_collision(self.player_sprite2)
+        self.check_checkpoint_collision(self.player_sprite)
+        self.check_checkpoint_collision(self.player_sprite2)
 
         self.check_restart_player(self.player_sprite, self.player_sprite2)
 
