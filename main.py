@@ -232,6 +232,17 @@ class MyGame(arcade.View):
             score += 1
         return score
 
+    def check_button_collision(self, player_sprite: arcade.Sprite):
+        button_hit_list = arcade.check_for_collision_with_list(player_sprite, self.scene["attivabili"])
+
+        for button in button_hit_list:
+            piattaforma = button.properties["piattaforma"]
+            for platform in self.scene["piattaforme"]:
+                if platform.properties["attivabile"] == piattaforma:
+                    platform.change_x = 0.5
+                    self.scene["attivabili"].remove(button)
+                    self.scene["foreground"].append(button)
+
     def check_restart_player(self, player_sprite, player_sprite2):
         # Did the player fall off the map?
         if player_sprite.center_y < -100:
@@ -276,6 +287,8 @@ class MyGame(arcade.View):
 
         self.score_player1 = self.check_coin_collision(self.player_sprite, self.score_player1)
         self.score_player2 = self.check_coin_collision(self.player_sprite2, self.score_player2)
+        self.check_button_collision(self.player_sprite)
+        self.check_button_collision(self.player_sprite2)
 
         self.check_restart_player(self.player_sprite, self.player_sprite2)
 

@@ -32,7 +32,8 @@ class MyMenu(arcade.View):
         @quit_button.event("on_click")
         def on_click_quit(event):
             if self.hidden:
-                arcade.exit()
+                return
+            arcade.exit()
 
         self.v_box.add(quit_button)
 

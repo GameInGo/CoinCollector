@@ -5,6 +5,53 @@
  "layers":[
         {
          "draworder":"topdown",
+         "id":15,
+         "name":"attivabili",
+         "objects":[
+                {
+                 "gid":109,
+                 "height":18,
+                 "id":152,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"piattaforma",
+                         "type":"int",
+                         "value":1
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":18,
+                 "x":792,
+                 "y":198
+                }, 
+                {
+                 "gid":109,
+                 "height":18,
+                 "id":153,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"piattaforma",
+                         "type":"int",
+                         "value":2
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":18,
+                 "x":180,
+                 "y":378
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
          "id":8,
          "name":"scale",
          "objects":[
@@ -151,29 +198,6 @@
          "type":"tilelayer",
          "visible":true,
          "width":150,
-         "x":0,
-         "y":0
-        }, 
-        {
-         "draworder":"topdown",
-         "id":15,
-         "name":"attivabili",
-         "objects":[
-                {
-                 "gid":109,
-                 "height":18,
-                 "id":152,
-                 "name":"",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":18,
-                 "x":792,
-                 "y":198
-                }],
-         "opacity":1,
-         "type":"objectgroup",
-         "visible":true,
          "x":0,
          "y":0
         }, 
@@ -468,6 +492,11 @@
                  "name":"",
                  "properties":[
                         {
+                         "name":"attivabile",
+                         "type":"int",
+                         "value":2
+                        }, 
+                        {
                          "name":"boundary_left",
                          "type":"string",
                          "value":"470.0"
@@ -480,7 +509,12 @@
                         {
                          "name":"change_x",
                          "type":"string",
-                         "value":"0.5"
+                         "value":"0"
+                        }, 
+                        {
+                         "name":"moving",
+                         "type":"int",
+                         "value":0
                         }],
                  "rotation":0,
                  "type":"",
@@ -496,6 +530,11 @@
                  "name":"",
                  "properties":[
                         {
+                         "name":"attivabile",
+                         "type":"int",
+                         "value":0
+                        }, 
+                        {
                          "name":"boundary_left",
                          "type":"string",
                          "value":"800.0"
@@ -509,6 +548,11 @@
                          "name":"change_x",
                          "type":"string",
                          "value":"0.5"
+                        }, 
+                        {
+                         "name":"moving",
+                         "type":"int",
+                         "value":1
                         }],
                  "rotation":0,
                  "type":"",
@@ -524,6 +568,11 @@
                  "name":"",
                  "properties":[
                         {
+                         "name":"attivabile",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
                          "name":"boundary_left",
                          "type":"string",
                          "value":"1200.0"
@@ -537,6 +586,11 @@
                          "name":"change_x",
                          "type":"string",
                          "value":"0"
+                        }, 
+                        {
+                         "name":"moving",
+                         "type":"int",
+                         "value":0
                         }],
                  "rotation":0,
                  "type":"",
@@ -552,7 +606,7 @@
          "y":0
         }],
  "nextlayerid":16,
- "nextobjectid":153,
+ "nextobjectid":154,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.10.2",
