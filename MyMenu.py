@@ -2,14 +2,11 @@ import arcade, arcade.gui
 import main
 
 
-class QuitButton(arcade.gui.UIFlatButton):
-    def on_click(self, event: arcade.gui.UIOnClickEvent):
-        arcade.exit()
-
-
 class MyMenu(arcade.View):
     def __init__(self):
         super().__init__()
+
+        self.hidden = False
 
         # --- Required for all code that uses UI element,
         # a UIManager to handle the UI.
@@ -30,7 +27,13 @@ class MyMenu(arcade.View):
         self.v_box.add(settings_button.with_space_around(bottom=20))
 
         # Again, method 1. Use a child class to handle events.
-        quit_button = QuitButton(text="Quit", width=200)
+        quit_button = arcade.gui.UIFlatButton(text="Quit", width=200)
+
+        @quit_button.event("on_click")
+        def on_click_quit(event):
+            if self.hidden:
+                arcade.exit()
+
         self.v_box.add(quit_button)
 
         # --- Method 2 for handling click events,
@@ -41,6 +44,8 @@ class MyMenu(arcade.View):
         # use a decorator to handle on_click events
         @settings_button.event("on_click")
         def on_click_settings(event):
+            if self.hidden:
+                return
             print("Settings:", event)
             self.window.show_view(SettingsMenu())
 
@@ -53,18 +58,29 @@ class MyMenu(arcade.View):
             )
 
     def on_click_start(self, event):
+        if self.hidden:
+            return
+
         game_view = main.MyGame()
         self.window.show_view(game_view)
 
     def on_draw(self):
+        if self.hidden:
+            return
+
         self.clear()
         arcade.draw_lrwh_rectangle_textured(0,0, 800, 600, self.background)
         self.manager.draw()
+
+    def on_hide_view(self):
+        self.hidden = True
 
 
 class SettingsMenu(arcade.View):
     def __init__(self):
         super().__init__()
+
+        self.hidden = False
 
         self.manager = arcade.gui.UIManager()
         self.manager.enable()
@@ -74,6 +90,7 @@ class SettingsMenu(arcade.View):
         self.v_box = arcade.gui.UIBoxLayout()
         self.h_box = arcade.gui.UIBoxLayout(vertical=False)
         self.player_selection = arcade.gui.UIBoxLayout(vertical=False)
+        self.save_exit = arcade.gui.UIBoxLayout(vertical=False)
 
         keyboard_button = arcade.gui.UIFlatButton(text="Keyboard", width=200)
         self.h_box.add(keyboard_button.with_space_around(right=20))
@@ -87,7 +104,7 @@ class SettingsMenu(arcade.View):
         p2_button = arcade.gui.UIFlatButton(text="P2", width=200)
         self.player_selection.add(p2_button)
 
-        save_button = arcade.gui.UIFlatButton(text="Save", width=200)
+        save_button = arcade.gui.UIFlatButton(text="Save", width=400)
 
         self.v_box.add(self.h_box.with_space_around(bottom=20))
         self.v_box.add(self.player_selection.with_space_around(bottom=20))
@@ -98,21 +115,28 @@ class SettingsMenu(arcade.View):
 
         @keyboard_button.event("on_click")
         def on_click_keyboard(event):
+            if self.hidden:
+                return
             print("Keyboard selected")
             self.controls_choice = "keyboard2\n"
 
         @joy_button.event("on_click")
         def on_click_joy(event):
+            if self.hidden:
+                return
             print("Joystick selected")
             self.controls_choice = "joypad\n"
 
         @p1_button.event("on_click")
         def on_click_p1(event):
+            if self.hidden: return
             print("Playing as P1")
             self.player_choice = "P1\n"
 
         @p2_button.event("on_click")
         def on_click_p2(event):
+            if self.hidden:
+                return
             print("Playing as P2")
             self.player_choice = "P2\n"
 
@@ -134,11 +158,18 @@ class SettingsMenu(arcade.View):
 
         @save_button.event("on_click")
         def save_conf(event):
+            if self.hidden:
+                return
             f = open("input_conf.txt", "w")
             f.write(self.controls_choice)
             f.write(self.player_choice)
             f.close()
             self.window.show_view(MyMenu())
+            self.window.activate()
+
+    def on_hide_view(self):
+        self.hidden = True
+
 
     def on_draw(self):
         self.clear()
