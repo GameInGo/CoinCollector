@@ -55,6 +55,7 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
         BanyanBase.__init__(self, back_plane_ip_address=None,
                             process_name="MyGame", loop_time=.001)
 
+
         self.fresh_start = True
         self.topic = None
         self.subtopic = None
@@ -218,61 +219,6 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
             score += 1
         return score
 
-    def on_update(self, delta_time: float):
-        """Movement and game logic"""
-
-        self.player_sprite.update_character()
-        self.player_sprite2.update_character()
-
-        payload = {"x": self.player_sprite.center_x, "y": self.player_sprite.center_y} if self.player == "P1\n" else\
-            {"x": self.player_sprite2.center_x, "y": self.player_sprite2.center_y}
-        print(f"Publishing on topic {self.topic} -- [{payload}]")
-        self.publish_payload(payload, self.topic)
-
-        # Position the camera
-        self.center_camera_to_player()
-
-        camera_x = self.camera.position[0]
-        camera_y = self.camera.position[1]
-        for count, sprite in enumerate(self.backgrounds):
-            layer = count // 2
-            frame = count % 2
-            offset = camera_x / (2 ** (layer + 1))
-            jump = (camera_x - offset) // sprite.width
-            final_offset = offset + (jump + frame) * sprite.width
-            sprite.left = final_offset
-            sprite.bottom = camera_y
-
-        self.score_player1 = self.check_coin_collision(self.player_sprite, self.score_player1)
-        self.score_player2 = self.check_coin_collision(self.player_sprite2, self.score_player2)
-        self.check_button_collision(self.player_sprite)
-        self.check_button_collision(self.player_sprite2)
-        self.check_checkpoint_collision(self.player_sprite)
-        self.check_checkpoint_collision(self.player_sprite2)
-
-        self.check_restart_player(self.player_sprite, self.player_sprite2)
-
-        # Update walls, used with moving platforms
-        self.scene.update([LAYER_NAME_MOVING_PLATFORMS])
-
-        # Switch to the next level
-        if len(self.scene["gettoni"]) == 0:
-            # Advance to the next level
-            self.level += 1
-
-            # stop music when a new level is generated
-            arcade.stop_sound(self.player_sound)
-
-            # start from mymenu when levels are finished
-            if self.level == 3:
-                self.window.show_view(MyMenu.MyMenu())
-                return
-
-            # Make sure to keep the score from this level when setting up the next level
-            self.reset_score = False
-
-            # Load the next level
-            self.setup()
 
     def center_camera_to_player(self, player_sprite: PlayerCharacter):
         screen_center_x = player_sprite.center_x - (self.camera.viewport_width / 2)
@@ -394,7 +340,6 @@ class MyGameP1(MyGame):
         button_hit_list = arcade.check_for_collision_with_list(player_sprite, self.scene["attivabili"])
 
         for button in button_hit_list:
-            button.texture = arcade.load_texture_pair("./risorse/assets/frog_hit/frog_jump0.png")
             piattaforma = button.properties["piattaforma"]
             for platform in self.scene["piattaforme"]:
                 if platform.properties["attivabile"] == piattaforma:
@@ -449,8 +394,8 @@ class MyGameP1(MyGame):
         for count, platform in enumerate(self.scene["piattaforme"]):
             self.publish_payload({"idx": count, "c_x": platform.center_x, "c_y": platform.center_y}, self.platform_topic)
 
-        #for count, button in enumerate(self.scene["attivabili"]):
-        #    self.publish_payload({"idx": count, "button": button.}, self.button_topic)
+        for count, button in enumerate(self.scene["attivabili"]):
+            self.publish_payload({"idx": count, "button": button.properties["piattaforma"]}, self.button_topic)
 
         # Switch to the next level
         if len(self.scene["gettoni"]) == 0:
@@ -493,9 +438,8 @@ class MyGameP2(MyGame):
             self.player_sprite.change_y = payload["change_y"]
         elif topic == "platforms":
             idx = payload["idx"]
-            platform = payload["platform"]
-            self.scene["piattaforme"][idx].center_x = platform["c_x"]
-            self.scene["piattaforme"][idx].center_y = platform["c_y"]
+            self.scene["piattaforme"][idx].center_x = payload["c_x"]
+            self.scene["piattaforme"][idx].center_y = payload["c_y"]
 
     def setup(self):
         super().setup()
@@ -531,6 +475,7 @@ class MyGameP2(MyGame):
         self.scene.add_sprite("Player", self.player_sprite)
 
         self.start_listening()
+        self.set_subscriber_topic(self.platform_topic)
 
     def on_key_press(self, key: int, modifiers: int):
         """ Called whenever a key is pressed """
