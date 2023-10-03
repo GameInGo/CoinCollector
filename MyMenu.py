@@ -62,8 +62,18 @@ class MyMenu(arcade.View):
         if self.hidden:
             return
 
-        game_view = main.MyGame()
-        self.window.show_view(game_view)
+        f = open("input_conf.txt", "r")
+        line = f.readline()
+        player = f.readline()
+
+        if player == "P1\n":
+            print("Starting MyGameP1")
+            game_view = main.MyGameP1()
+            self.window.show_view(game_view)
+        else:
+            print("Starting MyGameP2")
+            game_view = main.MyGameP2()
+            self.window.show_view(game_view)
 
     def on_draw(self):
         if self.hidden:
