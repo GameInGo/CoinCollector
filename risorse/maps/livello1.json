@@ -43,6 +43,42 @@
                  "width":18,
                  "x":180,
                  "y":378
+                }, 
+                {
+                 "gid":109,
+                 "height":18,
+                 "id":158,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"piattaforma",
+                         "type":"int",
+                         "value":4
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":18,
+                 "x":1332,
+                 "y":90
+                }, 
+                {
+                 "gid":109,
+                 "height":18,
+                 "id":160,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"piattaforma",
+                         "type":"int",
+                         "value":3
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":18,
+                 "x":324,
+                 "y":216
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -250,7 +286,7 @@
         }, 
         {
          "compression":"zlib",
-         "data":"eJzt10sKwjAQxvH4OIGKr6OohxH0CC5E3YoIHtrpQog1NX1kTCL\/H3yIXTRTM0ysMQAAAACQh5Fk\/CWTeKUhYyvJ2oopfd9EqgsAgFB6jms7yVGyL30iT649Burq0j99yaAiQ+W1NaVaF37DPhcfkWtBPCnPgaraUq4ZQLrsd8N7gPs1nUXMLgBtFXOr6f\/1UDOH2RXGVDKTzGMXgr9R9NRScpZcItfShvZsYXY1Z\/dUrn2FT6\/zJ2SarG33VJGF+TwLfTV2PTvbPGOs81pjvzRyMu\/7GiK3mr9R1drlmeWrscuMu3ru\/W3Nus8ZSlGrxn5pRKNOl63jWgp9ZTz31lqzLfrq3cFxrXwG0ld+ufTVE8S0nwQ=",
+         "data":"eJzt10sKwjAQxvH4OIGKr6OohxH0CC5E3YoIHtrpQkhravrIkET+P\/gQu2imzTBRYwAAAAAgDxPJ9Edm8UpDxjaSrRVT+b6LVBcAAKEMHNcOkrPkWPlEnlx7DDTVp3+GklFNxspra0q1rhT947uyz8VX5FoQT8q9XVdbyjUDSJf93\/AZ4H5tZxGzC0BXxdxq+3s91MxhdoUxlywky9iF4G8UPbWWXCW3yLV0oT1bmF3t2T2Va1\/h2+f8CZk2a9s9VWRlvs9CX419z84uzxjrvNbYL41cTHlfQ+TR8B3VrV2dWb4a+8y4u+fev9Zs+pyhFLVq7JdGNOp02TuupdBXxnNvrTW7oq\/KTo5r1TOQvvLLpa\/e4uSfBQ==",
          "encoding":"base64",
          "height":25,
          "id":1,
@@ -264,7 +300,7 @@
         }, 
         {
          "compression":"zlib",
-         "data":"eJzt0kEKgCAQBdBOEa09RIeLFh49WgRCkaHIELwHf6GgfnCmCQAAAAAAAAAAAOAuRxcAgA9yZT36vb\/dT78lukCDOboAVXt0gQZbdAGqzBUjnHO1PiQVufbe\/rM8+0XqSOtc9bzZmr84ANroDmU=",
+         "data":"eJzt1sEJgDAMBVCnEM8O4QYuJQ4vHgQP0kqlxsp7kEtB+yHB2HUAAAAAAMCfzdEBAABomv9J4E2+Od+jJwC0ILWvauyy2vvxzvvt6FhDdIACfXQAstboAAWW6ABkmStq2OdquqjxVMdZqp\/nZ+8YH1TpXD25s7RasQFbpg5S",
          "encoding":"base64",
          "height":25,
          "id":4,
@@ -375,18 +411,6 @@
                  "visible":true,
                  "width":18,
                  "x":541,
-                 "y":180
-                }, 
-                {
-                 "gid":152,
-                 "height":18,
-                 "id":109,
-                 "name":"",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":18,
-                 "x":325,
                  "y":180
                 }, 
                 {
@@ -520,6 +544,18 @@
                  "width":18,
                  "x":1728,
                  "y":234
+                }, 
+                {
+                 "gid":152,
+                 "height":18,
+                 "id":161,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":18,
+                 "x":1674,
+                 "y":378
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -579,7 +615,7 @@
                         {
                          "name":"attivabile",
                          "type":"int",
-                         "value":0
+                         "value":1
                         }, 
                         {
                          "name":"boundary_left",
@@ -594,12 +630,12 @@
                         {
                          "name":"change_x",
                          "type":"string",
-                         "value":"0.5"
+                         "value":"0"
                         }, 
                         {
                          "name":"moving",
                          "type":"int",
-                         "value":1
+                         "value":0
                         }],
                  "rotation":0,
                  "type":"",
@@ -617,7 +653,7 @@
                         {
                          "name":"attivabile",
                          "type":"int",
-                         "value":1
+                         "value":3
                         }, 
                         {
                          "name":"boundary_left",
@@ -645,6 +681,34 @@
                  "width":18,
                  "x":918,
                  "y":396
+                }, 
+                {
+                 "gid":148,
+                 "height":18,
+                 "id":159,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"attivabile",
+                         "type":"int",
+                         "value":4
+                        }, 
+                        {
+                         "name":"boundary_left",
+                         "type":"string",
+                         "value":"1.800"
+                        }, 
+                        {
+                         "name":"boundary_right",
+                         "type":"string",
+                         "value":"2.400"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":18,
+                 "x":1638,
+                 "y":396
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -653,7 +717,7 @@
          "y":0
         }],
  "nextlayerid":17,
- "nextobjectid":158,
+ "nextobjectid":163,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.10.2",
