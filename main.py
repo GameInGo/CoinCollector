@@ -1,6 +1,7 @@
 """
 Platformer Game
 """
+import json
 import threading
 
 import arcade
@@ -49,19 +50,26 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
 
         self.event = threading.Event()
 
+        # Opening JSON file
+        with open('sample.json', 'r') as openfile:
+            # Reading from json file
+            self.json_conf = json.load(openfile)
+
+        address_full = self.json_conf["address"].split(":")
+        base_topic = address_full[1]
+
         # Call the parent class and set up the window
         arcade.View.__init__(self)
         threading.Thread.__init__(self)
-        BanyanBase.__init__(self, back_plane_ip_address=None,
+        BanyanBase.__init__(self, back_plane_ip_address=address_full[0],
                             process_name="MyGame", loop_time=.001)
 
-
         self.fresh_start = True
-        self.topic = None
-        self.subtopic = None
+        self.topic = base_topic
+        self.subtopic = base_topic
         self.player = None
-        self.platform_topic = "platforms"
-        self.button_topic = "buttons"
+        self.platform_topic = base_topic + "platforms"
+        self.button_topic = base_topic + "buttons"
 
         self.tile_map = None
         self.scene = None
@@ -185,6 +193,7 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
             self.start()
             self.fresh_start = False
             self.set_subscriber_topic(self.subtopic)
+            print(f"Sottoscritto a {self.subtopic}")
 
     def check_restart_player(self, player_sprite: PlayerCharacter, player_sprite2: PlayerCharacter):
         # Did the player fall off the map?
@@ -276,8 +285,8 @@ class MyGameP1(MyGame):
         super().__init__()
 
         self.player = "P1"
-        self.topic = "P1"
-        self.subtopic = "P2"
+        self.topic = self.topic + "P1"
+        self.subtopic = self.subtopic + "P2"
 
     def incoming_message_processing(self, topic, payload):
         if self.external_message_processor:
@@ -302,10 +311,7 @@ class MyGameP1(MyGame):
             "walls": self.scene[LAYER_NAME_PLATFORMS]
         }
 
-        f = open("input_conf.txt", "r")
-        line = f.readline()
-
-        if line == "joypad\n":
+        if self.json_conf["controls"] == "joypad\n":
             self.player_sprite = PlayerCharacterJoy(character="frog",
                                                     keymap_conf="keyboard1",
                                                     **kwargs)
@@ -389,6 +395,7 @@ class MyGameP1(MyGame):
             "change_x": self.player_sprite.change_x,
             "change_y": self.player_sprite.change_y
         }
+        print(f"publishing on [{self.topic}]")
         self.publish_payload(payload, self.topic)
 
         for count, platform in enumerate(self.scene["piattaforme"]):
@@ -422,8 +429,8 @@ class MyGameP2(MyGame):
         super().__init__()
 
         self.player = "P2"
-        self.topic = "P2"
-        self.subtopic = "P1"
+        self.topic = self.topic + "P2"
+        self.subtopic = self.subtopic + "P1"
 
     def incoming_message_processing(self, topic, payload):
         if self.external_message_processor:
@@ -431,12 +438,12 @@ class MyGameP2(MyGame):
 
         print(f"Received a message on topic [{topic}] -- [{payload}]")
 
-        if topic == "P1":
+        if topic == self.subtopic:
             self.player_sprite.center_x = payload["x"]
             self.player_sprite.center_y = payload["y"]
             self.player_sprite.change_x = payload["change_x"]
             self.player_sprite.change_y = payload["change_y"]
-        elif topic == "platforms":
+        elif topic == self.platform_topic:
             idx = payload["idx"]
             self.scene["piattaforme"][idx].center_x = payload["c_x"]
             self.scene["piattaforme"][idx].center_y = payload["c_y"]
@@ -453,10 +460,7 @@ class MyGameP2(MyGame):
             "walls": self.scene[LAYER_NAME_PLATFORMS]
         }
 
-        f = open("input_conf.txt", "r")
-        line = f.readline()
-
-        if line == "joypad\n":
+        if self.json_conf["controls"] == "joypad\n":
             self.player_sprite2 = PlayerCharacterJoy(character="masked",
                                                      keymap_conf="keyboard1",
                                                      **kwargs)
@@ -475,7 +479,9 @@ class MyGameP2(MyGame):
         self.scene.add_sprite("Player", self.player_sprite)
 
         self.start_listening()
+        # TODO: mettere guardia sottoscrizione già avviata
         self.set_subscriber_topic(self.platform_topic)
+        print(f"sottoscritto a {self.platform_topic}")
 
     def on_key_press(self, key: int, modifiers: int):
         """ Called whenever a key is pressed """

@@ -1,4 +1,5 @@
 import arcade, arcade.gui
+import json
 import main
 
 
@@ -62,10 +63,12 @@ class MyMenu(arcade.View):
         if self.hidden:
             return
 
-        f = open("input_conf.txt", "r")
-        line = f.readline()
-        player = f.readline()
+        # Opening JSON file
+        with open('sample.json', 'r') as openfile:
+            # Reading from json file
+            self.json_conf = json.load(openfile)
 
+        player = self.json_conf["player"]
         if player == "P1\n":
             print("Starting MyGameP1")
             game_view = main.MyGameP1()
@@ -90,6 +93,16 @@ class MyMenu(arcade.View):
 class SettingsMenu(arcade.View):
     def __init__(self):
         super().__init__()
+
+        self.controls_choice = "keyboard2\n"
+        self.player_choice = "P1\n"
+        self.address = "127.0.0.1:basic"
+
+        self.configuration = {
+            "controls": self.controls_choice,
+            "player": self.player_choice,
+            "address": self.address
+        }
 
         self.hidden = False
 
@@ -117,12 +130,16 @@ class SettingsMenu(arcade.View):
 
         save_button = arcade.gui.UIFlatButton(text="Save", width=400)
 
+        self.address_conf = arcade.gui.UIInputText(
+            color=arcade.color.ALICE_BLUE,
+            font_size=24,
+            width=400,
+            text='192.168.x.x:topic')
+
         self.v_box.add(self.h_box.with_space_around(bottom=20))
         self.v_box.add(self.player_selection.with_space_around(bottom=20))
+        self.v_box.add(self.address_conf)
         self.v_box.add(save_button)
-
-        self.controls_choice = "keyboard2\n"
-        self.player_choice = "P1\n"
 
         @keyboard_button.event("on_click")
         def on_click_keyboard(event):
@@ -171,10 +188,17 @@ class SettingsMenu(arcade.View):
         def save_conf(event):
             if self.hidden:
                 return
-            f = open("input_conf.txt", "w")
-            f.write(self.controls_choice)
-            f.write(self.player_choice)
-            f.close()
+            
+            self.configuration["address"] = self.address_conf.text
+            self.configuration["controls"] = self.controls_choice
+            self.configuration["player"] = self.player_choice
+
+            with open("sample.json", "w") as outfile:
+                json.dump(self.configuration, outfile)
+
+            address = self.configuration["address"].split(":")[0]
+            print(address)
+
             self.window.show_view(MyMenu())
             self.window.activate()
 
