@@ -96,7 +96,7 @@ class SettingsMenu(arcade.View):
 
         self.controls_choice = "keyboard2\n"
         self.player_choice = "P1\n"
-        self.address = "127.0.0.1:basic"
+        self.address = "192.168.1.180:basic"
 
         self.configuration = {
             "controls": self.controls_choice,
@@ -134,7 +134,7 @@ class SettingsMenu(arcade.View):
             color=arcade.color.ALICE_BLUE,
             font_size=24,
             width=400,
-            text='192.168.x.x:topic')
+            text=self.address)
 
         self.v_box.add(self.h_box.with_space_around(bottom=20))
         self.v_box.add(self.player_selection.with_space_around(bottom=20))
