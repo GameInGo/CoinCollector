@@ -346,6 +346,8 @@ class MyGameP1(MyGame):
         button_hit_list = arcade.check_for_collision_with_list(player_sprite, self.scene["attivabili"])
 
         for button in button_hit_list:
+            button.texture = self.tile_map._create_sprite_from_tile(self.tile_map._get_tile_by_gid(108)).texture
+
             piattaforma = button.properties["piattaforma"]
             for platform in self.scene["piattaforme"]:
                 if platform.properties["attivabile"] == piattaforma:
@@ -357,7 +359,8 @@ class MyGameP1(MyGame):
                     self.scene["foreground"].append(button)
 
     def check_checkpoint_collision(self, player_sprite: PlayerCharacter):
-        if arcade.check_for_collision_with_list(player_sprite, self.scene["checkpoint"]):
+        checkpoint = arcade.check_for_collision_with_list(player_sprite, self.scene["checkpoint"])
+        if checkpoint:
             player_sprite.update_checkpoint(player_sprite.center_x, player_sprite.center_y)
 
     def on_update(self, delta_time: float):
