@@ -36,6 +36,7 @@ LAYER_NAME_BACKGROUND = "background"
 LAYER_NAME_DONT_TOUCH = "no_touch"
 LAYER_NAME_MOVING_PLATFORMS = "piattaforme"
 LAYER_NAME_LADDERS = "scale"
+ANIMATION_RESET = 10
 
 # Movement speed of player, in pixels per frame
 PLAYER_MOVEMENT_SPEED = 3
@@ -70,9 +71,11 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
         self.player = None
         self.platform_topic = base_topic + "platforms"
         self.button_topic = base_topic + "buttons"
-
+        self.flag = None
         self.tile_map = None
         self.scene = None
+        self.flag_anim = True
+        self.counter = 0
 
         # Separate variable that holds the player sprite
         self.player_sprite = None
@@ -360,6 +363,10 @@ class MyGameP1(MyGame):
 
     def check_checkpoint_collision(self, player_sprite: PlayerCharacter):
         checkpoint = arcade.check_for_collision_with_list(player_sprite, self.scene["checkpoint"])
+
+        for flag in checkpoint:
+            self.flag = flag
+
         if checkpoint:
             player_sprite.update_checkpoint(player_sprite.center_x, player_sprite.center_y)
 
@@ -389,8 +396,16 @@ class MyGameP1(MyGame):
         self.check_button_collision(self.player_sprite2)
         self.check_checkpoint_collision(self.player_sprite)
         self.check_checkpoint_collision(self.player_sprite2)
-
         self.check_restart_player(self.player_sprite, self.player_sprite2)
+
+        if self.flag != None and self.counter == 0:
+            if self.flag_anim:
+                self.flag.texture = self.tile_map._create_sprite_from_tile(self.tile_map._get_tile_by_gid(112)).texture
+                self.flag_anim = False
+            else:
+                self.flag.texture = self.tile_map._create_sprite_from_tile(self.tile_map._get_tile_by_gid(113)).texture
+                self.flag_anim = True
+        self.counter = (self.counter + 1) % ANIMATION_RESET
 
         # Update walls, used with moving platforms
         self.scene.update([LAYER_NAME_MOVING_PLATFORMS])
@@ -401,7 +416,7 @@ class MyGameP1(MyGame):
             "change_x": self.player_sprite.change_x,
             "change_y": self.player_sprite.change_y
         }
-        print(f"publishing on [{self.topic}]")
+    
         self.publish_payload(payload, self.topic)
 
         for count, platform in enumerate(self.scene["piattaforme"]):
