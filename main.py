@@ -14,7 +14,7 @@ import MyMenu
 # Constants
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 500
-SCREEN_TITLE = "Platformer"
+SCREEN_TITLE = "CoinCollector_1.0"
 STARTING_X = 64
 STARTING_Y = 128
 
@@ -24,9 +24,6 @@ COIN_SCALING = 0.5
 SPRITE_PIXEL_SIZE = 16
 GRID_PIXEL_SIZE = SPRITE_PIXEL_SIZE * TILE_SCALING
 
-# Player starting position
-PLAYER_START_X = 64
-PLAYER_START_Y = 225
 
 # Layer Names from our TileMap
 LAYER_NAME_PLATFORMS = "terreno"

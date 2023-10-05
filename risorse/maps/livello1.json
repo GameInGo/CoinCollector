@@ -77,7 +77,7 @@
                  "type":"",
                  "visible":true,
                  "width":18,
-                 "x":1422,
+                 "x":1260,
                  "y":90
                 }, 
                 {
@@ -115,6 +115,24 @@
                  "width":18,
                  "x":2466,
                  "y":306
+                }, 
+                {
+                 "gid":109,
+                 "height":18,
+                 "id":215,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"piattaforma",
+                         "type":"int",
+                         "value":7
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":18,
+                 "x":792,
+                 "y":72
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -320,7 +338,7 @@
         }, 
         {
          "compression":"zlib",
-         "data":"eJzt2EEKwjAQQNGeQT2NeBGX9gx6CK2HdtwPCBEnP\/E\/mG3nU0oiLoskSZL+1S5mH3PoHaKpHGPWmFPvEE3nVrRnLdrTit43mi3mWbDnUrDjG\/S+0VS9z6pzsRW9bzRV7\/NetKcVvW80j6I99HuG3qcc\/Z6h9ym39Q74gN6nHP2eofcpR79n6H3KeR7oF+jnAb1POfrvYr+rMdHvQXqfcvTzgN73du4dAFT1v34rep8kSdJMroDnvgDyyxI6",
+         "data":"eJzt2EEKwjAQRuGeS7yIS3sGPYTWQxv3A4Wof17K+yDbzqOUjLgskiRJkvQ7p3bWds6jQ3Q499CcNTSnF71vNls7r8Cca2DGN+h9s0m9z9S92IveN5vU+3yE5vSi983mGZpD3zP0PtXoe4bep9o2OmAHvU81+p6h96lG3zP0PtW8D\/QP9PuA3qca\/Xex39Wc6HuQ3qca\/T6g931cRgcApf7X70XvkyRJOpIb4LlvI\/USAQ==",
          "encoding":"base64",
          "height":25,
          "id":5,
@@ -334,7 +352,7 @@
         }, 
         {
          "compression":"zlib",
-         "data":"eJztl1FuwjAQRN3SE7QFWo4CPQwSHIEPBP2tqkrlzqw\/IlnGwbG99m7CPGmEiMJ67EzWxhgAAAAAAAAAGAevpLc7eg\/85qmZu7i\/Po9AljVp48h437+EfHXE\/GnwCEAOLfszAI9O6H3bkY6kvfepBY3+NPctzd6Afkry80ya9eil8tg10epLI1NcK3ff+Rf2EkK7v6mgOdt93jR7BgDoxf3v9cdQL7UXxe7n9gdAK+bSBh4A2xdSz8Nc5yWpc9clcG3MZ8AFaUn6kDYCJoPN1Ip0Jn0Le8mh9vs85n4hhZupseZKEykZDN1rnwfHntHtP5xKGdvNlNWnuZ1XzGPpOuTMUWq\/9teC28fJhJ9BTp0zs34Lx\/Z7VsxjSY\/7idS+N+bQeXJhvfprMXTuQ\/tYV780WzVyFWKbMHbLXJlI7Vpj5jIkV1um+n7tlLqtcnUIXPP3QOQqTm6\/yqlfUvsKGQZ2rQ==",
+         "data":"eJztl11OwzAQhA30BPwVOApwmEpwBB6qlleEkEBcuesHS5Hr4J9dZ9dlPmlUJYrW43i8bpwDAAAAAAD\/lUvSFela28hgnDGvQTshs3PSznLOnwWP4JhH0tNELrp+VvIVyPmz4HFE0Jv1wRoAsByp\/fZC2pJeo18rWPRntW+dk1baJkAXlsocZxyfv4sZleTyhjF2T6zud4tYe1c+k7+O1xen5863hClhavzNrY+1dbOI5XdkaV0teQEAtDH99voSqFe7\/3PPS\/vrAXoeSGH1W+eU8H2h9v+61H7V2vc\/iXsj96Bb0pp0p20EnAw+Uw+kPeld2UsLvffzyP1Ci2mmRs2VJWoymHrWrwfnzAg1w\/kjqVLiTHndu+N55Txyz86WOWqd1\/G7kPaxc+k1aKmzF9Ync+y4Z+U8cnrcR6b2X2OWzlMK7zV+F6VzL+1joT43Wz1ylWJTMfaSuXKZ2r3GbKUkVxuh+nHtmrpL5eotcS8+A5GrPK39qqU+p\/YBtu53nw==",
          "encoding":"base64",
          "height":25,
          "id":1,
@@ -348,7 +366,7 @@
         }, 
         {
          "compression":"zlib",
-         "data":"eJzt1kEKgzAQBVBPUVx7iN7AS4mHL10UXASVsWESfQ9mIyT+ZAZxGAAAAAAAgDubswMAANA1\/5Pcldluk760R08AnqPnb\/5e9hrnqn1XZ\/bvuV8RrZ13zA4Q8MoOwKE1O0DAkh2AQ+aKGr5z9S7UtKnfs71+bteeMV2o6FxdeWe0Skr3Ha1\/7f0BHjAWFw==",
+         "data":"eJzt19EJgzAQAFCnKP12iG6QpYrDl34UpKSaJtpc9T04RNF4uRxKhgEA4LhS4zkAAMCW7DnoRe8RTXo7nt2nOqgPAFH4J3FUejsm6xKPNQE4j3\/+5i\/l\/s28Su\/du1Yl46cf5BFJtLleeydQ4dI7AVZNvROocO+dAKv0FXt49tUtE+MsXteW1nP+bImxIWr7quWdtZGTq3dtbDX2A035GQ4=",
          "encoding":"base64",
          "height":25,
          "id":4,
@@ -458,7 +476,7 @@
                  "type":"",
                  "visible":true,
                  "width":18,
-                 "x":541,
+                 "x":522,
                  "y":180
                 }, 
                 {
@@ -740,50 +758,134 @@
                 {
                  "gid":152,
                  "height":18,
-                 "id":186,
+                 "id":207,
                  "name":"",
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":18,
-                 "x":2394,
-                 "y":126
+                 "x":2664,
+                 "y":180
                 }, 
                 {
                  "gid":152,
                  "height":18,
-                 "id":187,
+                 "id":208,
                  "name":"",
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":18,
-                 "x":2340,
-                 "y":126
+                 "x":2664,
+                 "y":270
                 }, 
                 {
                  "gid":152,
                  "height":18,
-                 "id":188,
+                 "id":209,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":18,
+                 "x":2664,
+                 "y":360
+                }, 
+                {
+                 "gid":152,
+                 "height":18,
+                 "id":210,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":18,
+                 "x":2358,
+                 "y":234
+                }, 
+                {
+                 "gid":152,
+                 "height":18,
+                 "id":211,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":18,
+                 "x":2250,
+                 "y":234
+                }, 
+                {
+                 "gid":152,
+                 "height":18,
+                 "id":212,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":18,
+                 "x":990,
+                 "y":198
+                }, 
+                {
+                 "gid":152,
+                 "height":18,
+                 "id":218,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":18,
+                 "x":594,
+                 "y":54
+                }, 
+                {
+                 "gid":152,
+                 "height":18,
+                 "id":219,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":18,
+                 "x":468,
+                 "y":54
+                }, 
+                {
+                 "gid":152,
+                 "height":18,
+                 "id":220,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":18,
+                 "x":2358,
+                 "y":54
+                }, 
+                {
+                 "gid":152,
+                 "height":18,
+                 "id":221,
                  "name":"",
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":18,
                  "x":2286,
-                 "y":126
+                 "y":54
                 }, 
                 {
                  "gid":152,
                  "height":18,
-                 "id":189,
+                 "id":222,
                  "name":"",
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":18,
-                 "x":2232,
-                 "y":126
+                 "x":2214,
+                 "y":54
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -810,7 +912,7 @@
                         {
                          "name":"boundary_left",
                          "type":"string",
-                         "value":"470.0"
+                         "value":"500.0"
                         }, 
                         {
                          "name":"boundary_right",
@@ -848,7 +950,7 @@
                         {
                          "name":"boundary_left",
                          "type":"string",
-                         "value":"800.0"
+                         "value":"750.0"
                         }, 
                         {
                          "name":"boundary_right",
@@ -884,11 +986,6 @@
                          "value":3
                         }, 
                         {
-                         "name":"boundary_bottom",
-                         "type":"float",
-                         "value":0
-                        }, 
-                        {
                          "name":"boundary_left",
                          "type":"string",
                          "value":"1200.0"
@@ -897,11 +994,6 @@
                          "name":"boundary_right",
                          "type":"string",
                          "value":"1500.0"
-                        }, 
-                        {
-                         "name":"boundary_top",
-                         "type":"float",
-                         "value":0
                         }, 
                         {
                          "name":"change_x",
@@ -940,6 +1032,11 @@
                          "name":"boundary_right",
                          "type":"string",
                          "value":"2400.0"
+                        }, 
+                        {
+                         "name":"moving",
+                         "type":"int",
+                         "value":0
                         }],
                  "rotation":0,
                  "type":"",
@@ -1012,7 +1109,40 @@
                  "visible":true,
                  "width":18,
                  "x":2448,
-                 "y":144
+                 "y":108
+                }, 
+                {
+                 "gid":148,
+                 "height":18,
+                 "id":216,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"attivabile",
+                         "type":"int",
+                         "value":7
+                        }, 
+                        {
+                         "name":"boundary_left",
+                         "type":"string",
+                         "value":"450.0"
+                        }, 
+                        {
+                         "name":"boundary_right",
+                         "type":"string",
+                         "value":"900.0"
+                        }, 
+                        {
+                         "name":"moving",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":18,
+                 "x":684,
+                 "y":72
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -1021,7 +1151,7 @@
          "y":0
         }],
  "nextlayerid":19,
- "nextobjectid":207,
+ "nextobjectid":223,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.10.2",
