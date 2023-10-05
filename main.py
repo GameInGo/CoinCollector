@@ -351,9 +351,9 @@ class MyGameP1(MyGame):
             piattaforma = button.properties["piattaforma"]
             for platform in self.scene["piattaforme"]:
                 if platform.properties["attivabile"] == piattaforma:
-                    if platform.properties["moving"] == 0:
+                    if platform.properties["moving"] == 1:
                         platform.change_y = 0.5
-                    else:
+                    elif platform.properties["moving"] == 0:
                         platform.change_x = 0.5
                     self.scene["attivabili"].remove(button)
                     self.scene["foreground"].append(button)
