@@ -14,7 +14,7 @@ import MyMenu
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 500
 SCREEN_TITLE = "Platformer"
-STARTING_X = 64
+STARTING_X = 3100
 STARTING_Y = 128
 
 # Constants used to scale our sprites from their original size
@@ -343,7 +343,10 @@ class MyGameP1(MyGame):
             piattaforma = button.properties["piattaforma"]
             for platform in self.scene["piattaforme"]:
                 if platform.properties["attivabile"] == piattaforma:
-                    platform.change_x = 0.5
+                    if platform.properties["moving"] == 1:
+                        platform.change_y = 0.5
+                    elif platform.properties["moving"] == 0:
+                        platform.change_x = 0.5
                     self.scene["attivabili"].remove(button)
                     self.scene["foreground"].append(button)
 
