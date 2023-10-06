@@ -131,8 +131,8 @@
                  "type":"",
                  "visible":true,
                  "width":18,
-                 "x":792,
-                 "y":72
+                 "x":810,
+                 "y":108
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -338,7 +338,7 @@
         }, 
         {
          "compression":"zlib",
-         "data":"eJzt2EEKwjAQRuGeS7yIS3sGPYTWQxv3A4Wof17K+yDbzqOUjLgskiRJkvQ7p3bWds6jQ3Q499CcNTSnF71vNls7r8Cca2DGN+h9s0m9z9S92IveN5vU+3yE5vSi983mGZpD3zP0PtXoe4bep9o2OmAHvU81+p6h96lG3zP0PtW8D\/QP9PuA3qca\/Xex39Wc6HuQ3qca\/T6g931cRgcApf7X70XvkyRJOpIb4LlvI\/USAQ==",
+         "data":"eJzt2EEOgjAQQNGey3gQXeIZ9BCKhwbjdhIWzdA\/8F\/Ctv0hpAO0JkmSJEk6k9voALjH6IAN9L5qLu1\/T6\/J+0zJ6\/ei91X0OsgePeh9Fc3r9U3e4528fi96X0WfHfagzxl6n2L0OUPvU2weHbCB3qcYfc7Q+xSjzxl6n2J+bykD\/Tyg9ylGfy\/2uaqJ\/l5M71OMfh7Q+37uowOA9vin34PeJ0mSdCRPwLoLCB0Rqw==",
          "encoding":"base64",
          "height":25,
          "id":5,
@@ -352,7 +352,7 @@
         }, 
         {
          "compression":"zlib",
-         "data":"eJztl11OwzAQhA30BPwVOApwmEpwBB6qlleEkEBcuesHS5Hr4J9dZ9dlPmlUJYrW43i8bpwDAAAAAAD\/lUvSFela28hgnDGvQTshs3PSznLOnwWP4JhH0tNELrp+VvIVyPmz4HFE0Jv1wRoAsByp\/fZC2pJeo18rWPRntW+dk1baJkAXlsocZxyfv4sZleTyhjF2T6zud4tYe1c+k7+O1xen5863hClhavzNrY+1dbOI5XdkaV0teQEAtDH99voSqFe7\/3PPS\/vrAXoeSGH1W+eU8H2h9v+61H7V2vc\/iXsj96Bb0pp0p20EnAw+Uw+kPeld2UsLvffzyP1Ci2mmRs2VJWoymHrWrwfnzAg1w\/kjqVLiTHndu+N55Txyz86WOWqd1\/G7kPaxc+k1aKmzF9Ync+y4Z+U8cnrcR6b2X2OWzlMK7zV+F6VzL+1joT43Wz1ylWJTMfaSuXKZ2r3GbKUkVxuh+nHtmrpL5eotcS8+A5GrPK39qqU+p\/YBtu53nw==",
+         "data":"eJztl+tKAzEQhePlCbReH0V9mII+gj\/E9q+IoPjKToSFNKYmc8lmtpwPhrLLMnN2cjLphgAAAAAAAADQcMS8BnLOKM7\/idU4ab\/U9HnQuDTS\/TP117qHdxT3SYTs+sG4HpeaPg8aI5h1gAs8A8B8lPbbI8ULxVP26wWP+rzOrWOK09EiQBfm8pymTvTfyZ5o8eWFonZPvO53j3jrVfTkd9DNxfTc+bQQZQxH37718bZuHvHcoxHryq3puX8AgF3Sby8LuPu\/9nyq70OkqD+YeaCE12+dQyLOBe7\/dav9OmrffxXuLXkGXVJcUVyPFgIOhuipW4oNxXawFgm99\/OS58UoUk8t1Vee4Hiw9GxcD82ZMeWczh\/LaCX3VIyb8Pe9ahq1Z6fkHUed13kvrHW8hvIaSPJsjONdWTufWTWNW0bNnLfGd7KsKSVqzXvROt9b59iUX+utHr4qsWbUlvhKg9RXI2jx1doof56bk3cuXz0X7uVnIHxVRzqvJPk1uX8AGH93ng==",
          "encoding":"base64",
          "height":25,
          "id":1,
@@ -366,7 +366,7 @@
         }, 
         {
          "compression":"zlib",
-         "data":"eJzt19EJgzAQAFCnKP12iG6QpYrDl34UpKSaJtpc9T04RNF4uRxKhgEA4LhS4zkAAMCW7DnoRe8RTXo7nt2nOqgPAFH4J3FUejsm6xKPNQE4j3\/+5i\/l\/s28Su\/du1Yl46cf5BFJtLleeydQ4dI7AVZNvROocO+dAKv0FXt49tUtE+MsXteW1nP+bImxIWr7quWdtZGTq3dtbDX2A035GQ4=",
+         "data":"eJzt1ksOgjAQAFBOYVxzCG\/QSxkPb1yYEFNpKWJH+14yIRAo0+nwmSYAgHGkjftAPc8PAECZfyZ60XtEk162o3tXB\/UBIArfJP6V3o7JusRjTQDG8cvv\/LXct8yr9tyja1UzfvpCHpFEm+u5dwINTr0ToOjWO4EG194JUKSvOMKjry6ZmBfxPLa2nstra8w7orWv9tyzNXJy9W6NT419B2C6GQ4=",
          "encoding":"base64",
          "height":25,
          "id":4,
@@ -620,7 +620,7 @@
                  "type":"",
                  "visible":true,
                  "width":18,
-                 "x":1692,
+                 "x":1656,
                  "y":360
                 }, 
                 {
@@ -848,7 +848,7 @@
                  "type":"",
                  "visible":true,
                  "width":18,
-                 "x":468,
+                 "x":432,
                  "y":54
                 }, 
                 {
@@ -873,18 +873,6 @@
                  "visible":true,
                  "width":18,
                  "x":2286,
-                 "y":54
-                }, 
-                {
-                 "gid":152,
-                 "height":18,
-                 "id":222,
-                 "name":"",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":18,
-                 "x":2214,
                  "y":54
                 }],
          "opacity":1,
@@ -1125,12 +1113,12 @@
                         {
                          "name":"boundary_left",
                          "type":"string",
-                         "value":"450.0"
+                         "value":"500.0"
                         }, 
                         {
                          "name":"boundary_right",
                          "type":"string",
-                         "value":"900.0"
+                         "value":"960.0"
                         }, 
                         {
                          "name":"moving",
@@ -1141,7 +1129,7 @@
                  "type":"",
                  "visible":true,
                  "width":18,
-                 "x":684,
+                 "x":720,
                  "y":72
                 }],
          "opacity":1,
