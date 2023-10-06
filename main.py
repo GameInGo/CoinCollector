@@ -17,6 +17,8 @@ SCREEN_HEIGHT = 500
 SCREEN_TITLE = "CoinCollector_1.0"
 STARTING_X = 64
 STARTING_Y = 128
+SPRITE_SCALING = 2.5
+BACKGROUND_RISE_AMOUNT = 30
 
 # Constants used to scale our sprites from their original size
 TILE_SCALING = 1.3
@@ -111,17 +113,28 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
 
     def setup(self):
 
-        image = "./risorse/sfondi/Glacial_mountains.png"
+        images = ("./risorse/sfondi/layers_fullcolor/sky.png",
+                  "./risorse/sfondi/layers_fullcolor/far_mountains_fc.png",
+                  "./risorse/sfondi/layers_fullcolor/grassy_mountains_fc.png",
+                  "./risorse/sfondi/layers_fullcolor/clouds_mid_t_fc.png",
+                  "./risorse/sfondi/layers_fullcolor/clouds_mid_fc.png",
+                  "./risorse/sfondi/layers_fullcolor/clouds_front_fc.png",
+                  "./risorse/sfondi/layers_fullcolor/clouds_front_t_fc.png")
 
-        sprite = arcade.Sprite(image, scale=3)
-        sprite.bottom = 0
-        sprite.left = 0
-        self.backgrounds.append(sprite)
+        rise = BACKGROUND_RISE_AMOUNT * SPRITE_SCALING
 
-        sprite2 = arcade.Sprite(image, scale=3)
-        sprite2.bottom = 0
-        sprite2.left = sprite2.width
-        self.backgrounds.append(sprite2)
+        for count, image in enumerate(images):
+            bottom = rise * (len(images) - count - 1) 
+
+            sprite = arcade.Sprite(image, scale=SPRITE_SCALING)
+            sprite.bottom = bottom 
+            sprite.left = 0
+            self.backgrounds.append(sprite)
+
+            sprite = arcade.Sprite(image, scale=SPRITE_SCALING)
+            sprite.bottom = bottom 
+            sprite.left = sprite.width
+            self.backgrounds.append(sprite)
 
         """Set up the game here. Call this function to restart the game."""
         # Set up scene
