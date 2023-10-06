@@ -33,7 +33,7 @@ LAYER_NAME_BACKGROUND = "background"
 LAYER_NAME_DONT_TOUCH = "no_touch"
 LAYER_NAME_MOVING_PLATFORMS = "piattaforme"
 LAYER_NAME_LADDERS = "scale"
-ANIMATION_RESET = 10
+ANIMATION_RESET = 15
 
 # Movement speed of player, in pixels per frame
 PLAYER_MOVEMENT_SPEED = 3
@@ -73,6 +73,7 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
         self.scene = None
         self.flag_anim = True
         self.counter = 0
+        self.coin_anim = True
 
         # Separate variable that holds the player sprite
         self.player_sprite = None
@@ -86,7 +87,7 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
         self.jump_sound = arcade.load_sound(":resources:sounds/jump1.wav")
         self.jump_sound2 = arcade.load_sound(":resources:sounds/jump2.wav")
         self.game_over = arcade.load_sound(":resources:sounds/gameover1.wav")
-
+        self.button_activated = arcade.load_sound(":resources:sounds/hit3.wav")
         self.backgrounds = arcade.SpriteList()
 
         # Camera
@@ -350,6 +351,7 @@ class MyGameP1(MyGame):
 
         for button in button_hit_list:
             button.texture = self.tile_map._create_sprite_from_tile(self.tile_map._get_tile_by_gid(108)).texture
+            arcade.play_sound(self.button_activated)
 
             piattaforma = button.properties["piattaforma"]
             for platform in self.scene["piattaforme"]:
@@ -406,8 +408,17 @@ class MyGameP1(MyGame):
             else:
                 self.flag.texture = self.tile_map._create_sprite_from_tile(self.tile_map._get_tile_by_gid(113)).texture
                 self.flag_anim = True
-        self.counter = (self.counter + 1) % ANIMATION_RESET
 
+        # Update coin animation
+        if self.counter == 0:
+            for coin in self.scene["gettoni"]:
+                if self.coin_anim:
+                    coin.texture = self.tile_map._create_sprite_from_tile(self.tile_map._get_tile_by_gid(152)).texture
+                else:
+                    coin.texture = self.tile_map._create_sprite_from_tile(self.tile_map._get_tile_by_gid(153)).texture
+            self.coin_anim = not self.coin_anim
+        self.counter = (self.counter + 1 ) % ANIMATION_RESET
+        
         # Update walls, used with moving platforms
         self.scene.update([LAYER_NAME_MOVING_PLATFORMS])
 
@@ -551,7 +562,7 @@ class MyGameP2(MyGame):
 
         # Update walls, used with moving platforms
         self.scene.update([LAYER_NAME_MOVING_PLATFORMS])
-
+        
         payload = {
             "x": self.player_sprite2.center_x,
             "y": self.player_sprite2.center_y,
