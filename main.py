@@ -19,6 +19,7 @@ STARTING_X = 64
 STARTING_Y = 128
 SPRITE_SCALING = 2.5
 BACKGROUND_RISE_AMOUNT = 30
+MAX_LEVEL = 3
 
 # Constants used to scale our sprites from their original size
 TILE_SCALING = 1.3
@@ -209,13 +210,10 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
             self.set_subscriber_topic(self.subtopic)
             print(f"Sottoscritto a {self.subtopic}")
 
-    def check_restart_player(self, player_sprite: PlayerCharacter, player_sprite2: PlayerCharacter):
+    def check_restart_player(self, player_sprite: PlayerCharacter):
         # Did the player fall off the map?
         if player_sprite.center_y < -100:
             player_sprite.respawn()
-            arcade.play_sound(self.game_over)
-        if player_sprite2.center_y < -100:
-            player_sprite2.respawn()
             arcade.play_sound(self.game_over)
 
         # Did the player touch something they should not?
@@ -223,9 +221,6 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
             player_sprite.respawn()
             arcade.play_sound(self.game_over)
 
-        if arcade.check_for_collision_with_list(player_sprite2, self.scene[LAYER_NAME_DONT_TOUCH], method=1):
-            player_sprite2.respawn()
-            arcade.play_sound(self.game_over)
 
     def run(self):
         self.receive_loop()
@@ -242,6 +237,14 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
             score += 1
         return score
 
+    def check_checkpoint_collision(self, player_sprite: PlayerCharacter):
+        checkpoint = arcade.check_for_collision_with_list(player_sprite, self.scene["checkpoint"])
+
+        for flag in checkpoint:
+            self.flag = flag
+
+        if checkpoint:
+            player_sprite.update_checkpoint(player_sprite.center_x, player_sprite.center_y)
 
     def center_camera_to_player(self, player_sprite: PlayerCharacter):
         screen_center_x = player_sprite.center_x - (self.camera.viewport_width / 2)
@@ -258,6 +261,18 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
         
         player_centered = screen_center_x, screen_center_y
         self.camera.move_to(player_centered)
+
+        # Update background to camera
+        camera_x = self.camera.position[0]
+        camera_y = self.camera.position[1]
+        for count, sprite in enumerate(self.backgrounds):
+            layer = count // 2
+            frame = count % 2
+            offset = camera_x / (2 ** (layer + 1))
+            jump = (camera_x - offset) // sprite.width
+            final_offset = offset + (jump + frame) * sprite.width
+            sprite.left = final_offset
+            sprite.bottom = camera_y
 
     def on_draw(self):
         """Render the screen."""
@@ -297,6 +312,56 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
         )
 
 
+    def animate_world(self):
+        # Update flag animation
+        if self.flag != None and self.counter == 0:
+            if self.flag_anim:
+                self.flag.texture = self.tile_map._create_sprite_from_tile(self.tile_map._get_tile_by_gid(112)).texture
+                self.flag_anim = False
+            else:
+                self.flag.texture = self.tile_map._create_sprite_from_tile(self.tile_map._get_tile_by_gid(113)).texture
+                self.flag_anim = True
+
+        # Update coin animation
+        if self.counter == 0:
+            for coin in self.scene["gettoni"]:
+                if self.coin_anim:
+                    coin.texture = self.tile_map._create_sprite_from_tile(self.tile_map._get_tile_by_gid(152)).texture
+                else:
+                    coin.texture = self.tile_map._create_sprite_from_tile(self.tile_map._get_tile_by_gid(153)).texture
+            self.coin_anim = not self.coin_anim
+        self.counter = (self.counter + 1 ) % ANIMATION_RESET
+
+
+    def check_button_collision(self, player_sprite: arcade.Sprite):
+        button_hit_list = arcade.check_for_collision_with_list(player_sprite, self.scene["attivabili"])
+
+        for count, button in enumerate(button_hit_list):
+            button.texture = self.tile_map._create_sprite_from_tile(self.tile_map._get_tile_by_gid(108)).texture
+            arcade.play_sound(self.button_activated)
+
+
+    def check_level_switch(self):
+        # Switch to the next level
+        if len(self.scene["gettoni"]) == 0:
+            # Advance to the next level
+            self.level += 1
+
+            # stop music when a new level is generated
+            arcade.stop_sound(self.player_sound)
+
+            # start from mymenu when levels are finished
+            if self.level == MAX_LEVEL:
+                self.window.show_view(MyMenu.MyMenu())
+                return
+
+            # Make sure to keep the score from this level when setting up the next level
+            self.reset_score = False
+
+            # Load the next level
+            self.setup()
+
+
 class MyGameP1(MyGame):
     def __init__(self):
         super().__init__()
@@ -308,8 +373,6 @@ class MyGameP1(MyGame):
     def incoming_message_processing(self, topic, payload):
         if self.external_message_processor:
             self.external_message_processor(topic, payload)
-
-        print(f"Received a message on topic [{topic}] -- [{payload}]")
 
         self.player_sprite2.center_x = payload["x"]
         self.player_sprite2.center_y = payload["y"]
@@ -362,7 +425,7 @@ class MyGameP1(MyGame):
     def check_button_collision(self, player_sprite: arcade.Sprite):
         button_hit_list = arcade.check_for_collision_with_list(player_sprite, self.scene["attivabili"])
 
-        for button in button_hit_list:
+        for count, button in enumerate(button_hit_list):
             button.texture = self.tile_map._create_sprite_from_tile(self.tile_map._get_tile_by_gid(108)).texture
             arcade.play_sound(self.button_activated)
 
@@ -376,15 +439,6 @@ class MyGameP1(MyGame):
                     self.scene["attivabili"].remove(button)
                     self.scene["foreground"].append(button)
 
-    def check_checkpoint_collision(self, player_sprite: PlayerCharacter):
-        checkpoint = arcade.check_for_collision_with_list(player_sprite, self.scene["checkpoint"])
-
-        for flag in checkpoint:
-            self.flag = flag
-
-        if checkpoint:
-            player_sprite.update_checkpoint(player_sprite.center_x, player_sprite.center_y)
-
     def on_update(self, delta_time: float):
         """Movement and game logic"""
 
@@ -394,47 +448,19 @@ class MyGameP1(MyGame):
         # Position the camera
         self.center_camera_to_player(self.player_sprite)
 
-        camera_x = self.camera.position[0]
-        camera_y = self.camera.position[1]
-        for count, sprite in enumerate(self.backgrounds):
-            layer = count // 2
-            frame = count % 2
-            offset = camera_x / (2 ** (layer + 1))
-            jump = (camera_x - offset) // sprite.width
-            final_offset = offset + (jump + frame) * sprite.width
-            sprite.left = final_offset
-            sprite.bottom = camera_y
-
         self.score_player1 = self.check_coin_collision(self.player_sprite, self.score_player1)
         self.score_player2 = self.check_coin_collision(self.player_sprite2, self.score_player2)
         self.check_button_collision(self.player_sprite)
         self.check_button_collision(self.player_sprite2)
         self.check_checkpoint_collision(self.player_sprite)
-        self.check_checkpoint_collision(self.player_sprite2)
-        self.check_restart_player(self.player_sprite, self.player_sprite2)
-
-        # Update flag animation
-        if self.flag != None and self.counter == 0:
-            if self.flag_anim:
-                self.flag.texture = self.tile_map._create_sprite_from_tile(self.tile_map._get_tile_by_gid(112)).texture
-                self.flag_anim = False
-            else:
-                self.flag.texture = self.tile_map._create_sprite_from_tile(self.tile_map._get_tile_by_gid(113)).texture
-                self.flag_anim = True
-
-        # Update coin animation
-        if self.counter == 0:
-            for coin in self.scene["gettoni"]:
-                if self.coin_anim:
-                    coin.texture = self.tile_map._create_sprite_from_tile(self.tile_map._get_tile_by_gid(152)).texture
-                else:
-                    coin.texture = self.tile_map._create_sprite_from_tile(self.tile_map._get_tile_by_gid(153)).texture
-            self.coin_anim = not self.coin_anim
-        self.counter = (self.counter + 1 ) % ANIMATION_RESET
+        self.check_restart_player(self.player_sprite)
         
+        self.animate_world()
+
         # Update walls, used with moving platforms
         self.scene.update([LAYER_NAME_MOVING_PLATFORMS])
 
+        # Publish player and world updates
         payload = {
             "x": self.player_sprite.center_x,
             "y": self.player_sprite.center_y,
@@ -447,27 +473,7 @@ class MyGameP1(MyGame):
         for count, platform in enumerate(self.scene["piattaforme"]):
             self.publish_payload({"idx": count, "c_x": platform.center_x, "c_y": platform.center_y}, self.platform_topic)
 
-        for count, button in enumerate(self.scene["attivabili"]):
-            self.publish_payload({"idx": count, "button": button.properties["piattaforma"]}, self.button_topic)
-
-        # Switch to the next level
-        if len(self.scene["gettoni"]) == 0:
-            # Advance to the next level
-            self.level += 1
-
-            # stop music when a new level is generated
-            arcade.stop_sound(self.player_sound)
-
-            # start from mymenu when levels are finished
-            if self.level == 3:
-                self.window.show_view(MyMenu.MyMenu())
-                return
-
-            # Make sure to keep the score from this level when setting up the next level
-            self.reset_score = False
-
-            # Load the next level
-            self.setup()
+        self.check_level_switch()
 
 
 class MyGameP2(MyGame):
@@ -478,11 +484,11 @@ class MyGameP2(MyGame):
         self.topic = self.topic + "P2"
         self.subtopic = self.subtopic + "P1"
 
+        self.button_idx = None
+
     def incoming_message_processing(self, topic, payload):
         if self.external_message_processor:
             self.external_message_processor(topic, payload)
-
-        print(f"Received a message on topic [{topic}] -- [{payload}]")
 
         if topic == self.subtopic:
             self.player_sprite.center_x = payload["x"]
@@ -524,10 +530,10 @@ class MyGameP2(MyGame):
                                              **kwargs)
         self.scene.add_sprite("Player", self.player_sprite)
 
+        if self.fresh_start:
+            self.set_subscriber_topic(self.platform_topic)
         self.start_listening()
-        # TODO: mettere guardia sottoscrizione già avviata
-        self.set_subscriber_topic(self.platform_topic)
-        print(f"sottoscritto a {self.platform_topic}")
+
 
     def on_key_press(self, key: int, modifiers: int):
         """ Called whenever a key is pressed """
@@ -538,13 +544,11 @@ class MyGameP2(MyGame):
             self.clean_up()
             self.window.show_view(MyMenu.MyMenu())
 
+
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key."""
         self.player_sprite2.notify_keyrelease(key)
 
-    def check_checkpoint_collision(self, player_sprite: PlayerCharacter):
-        if arcade.check_for_collision_with_list(player_sprite, self.scene["checkpoint"]):
-            player_sprite.update_checkpoint(player_sprite.center_x, player_sprite.center_y)
 
     def on_update(self, delta_time: float):
         """Movement and game logic"""
@@ -555,23 +559,15 @@ class MyGameP2(MyGame):
         # Position the camera
         self.center_camera_to_player(self.player_sprite2)
 
-        camera_x = self.camera.position[0]
-        camera_y = self.camera.position[1]
-        for count, sprite in enumerate(self.backgrounds):
-            layer = count // 2
-            frame = count % 2
-            offset = camera_x / (2 ** (layer + 1))
-            jump = (camera_x - offset) // sprite.width
-            final_offset = offset + (jump + frame) * sprite.width
-            sprite.left = final_offset
-            sprite.bottom = camera_y
-
         self.score_player1 = self.check_coin_collision(self.player_sprite, self.score_player1)
         self.score_player2 = self.check_coin_collision(self.player_sprite2, self.score_player2)
-        self.check_checkpoint_collision(self.player_sprite)
+        self.check_button_collision(self.player_sprite)
+        self.check_button_collision(self.player_sprite2)
         self.check_checkpoint_collision(self.player_sprite2)
 
-        self.check_restart_player(self.player_sprite, self.player_sprite2)
+        self.animate_world()
+
+        self.check_restart_player(self.player_sprite2)
 
         # Update walls, used with moving platforms
         self.scene.update([LAYER_NAME_MOVING_PLATFORMS])
@@ -584,24 +580,7 @@ class MyGameP2(MyGame):
         }
         self.publish_payload(payload, self.topic)
 
-        # Switch to the next level
-        if len(self.scene["gettoni"]) == 0:
-            # Advance to the next level
-            self.level += 1
-
-            # stop music when a new level is generated
-            arcade.stop_sound(self.player_sound)
-
-            # start from mymenu when levels are finished
-            if self.level == 3:
-                self.window.show_view(MyMenu.MyMenu())
-                return
-
-            # Make sure to keep the score from this level when setting up the next level
-            self.reset_score = False
-
-            # Load the next level
-            self.setup()
+        self.check_level_switch()
 
 
 def main():
