@@ -27,6 +27,58 @@
          "y":0
         }, 
         {
+         "draworder":"topdown",
+         "id":10,
+         "name":"checkpoint",
+         "objects":[
+                {
+                 "gid":113,
+                 "height":18,
+                 "id":47,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":18,
+                 "x":504,
+                 "y":288
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":11,
+         "name":"attivabili",
+         "objects":[
+                {
+                 "gid":109,
+                 "height":18,
+                 "id":48,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"piattaforma",
+                         "type":"int",
+                         "value":1
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":18,
+                 "x":288,
+                 "y":288
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
          "compression":"zlib",
          "data":"eJztwTEBAAAAwqD1T20MH6AAAACAtwEPoAAB",
          "encoding":"base64",
@@ -279,8 +331,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":10,
- "nextobjectid":47,
+ "nextlayerid":12,
+ "nextobjectid":49,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.10.2",

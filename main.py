@@ -1,16 +1,25 @@
 """
 Platformer Game
 """
+import json
+import threading
 
 import arcade
 import arcade.gui
+from python_banyan.banyan_base import BanyanBase
+
 from PlayerCharacter import PlayerCharacter, PlayerCharacterJoy
 import MyMenu
 
 # Constants
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 500
-SCREEN_TITLE = "Platformer"
+SCREEN_TITLE = "CoinCollector_1.0"
+STARTING_X = 64
+STARTING_Y = 128
+SPRITE_SCALING = 2.5
+BACKGROUND_RISE_AMOUNT = 30
+MAX_LEVEL = 3
 
 # Constants used to scale our sprites from their original size
 TILE_SCALING = 1.3
@@ -18,9 +27,6 @@ COIN_SCALING = 0.5
 SPRITE_PIXEL_SIZE = 16
 GRID_PIXEL_SIZE = SPRITE_PIXEL_SIZE * TILE_SCALING
 
-# Player starting position
-PLAYER_START_X = 64
-PLAYER_START_Y = 225
 
 # Layer Names from our TileMap
 LAYER_NAME_PLATFORMS = "terreno"
@@ -30,22 +36,47 @@ LAYER_NAME_BACKGROUND = "background"
 LAYER_NAME_DONT_TOUCH = "no_touch"
 LAYER_NAME_MOVING_PLATFORMS = "piattaforme"
 LAYER_NAME_LADDERS = "scale"
+ANIMATION_RESET = 15
 
 # Movement speed of player, in pixels per frame
 PLAYER_MOVEMENT_SPEED = 3
 GRAVITY = 1.3
 
 
-class MyGame(arcade.View):
+class MyGame(arcade.View, threading.Thread, BanyanBase):
     """
     Main application class.
     """
     def __init__(self):
 
+        self.event = threading.Event()
+
+        # Opening JSON file
+        with open('sample.json', 'r') as openfile:
+            # Reading from json file
+            self.json_conf = json.load(openfile)
+
+        address_full = self.json_conf["address"].split(":")
+        base_topic = address_full[1]
+
         # Call the parent class and set up the window
-        super().__init__()
+        arcade.View.__init__(self)
+        threading.Thread.__init__(self)
+        BanyanBase.__init__(self, back_plane_ip_address=address_full[0],
+                            process_name="MyGame", loop_time=.001)
+
+        self.fresh_start = True
+        self.topic = base_topic
+        self.subtopic = base_topic
+        self.player = None
+        self.platform_topic = base_topic + "platforms"
+        self.button_topic = base_topic + "buttons"
+        self.flag = None
         self.tile_map = None
         self.scene = None
+        self.flag_anim = True
+        self.counter = 0
+        self.coin_anim = True
 
         # Separate variable that holds the player sprite
         self.player_sprite = None
@@ -59,6 +90,8 @@ class MyGame(arcade.View):
         self.jump_sound = arcade.load_sound(":resources:sounds/jump1.wav")
         self.jump_sound2 = arcade.load_sound(":resources:sounds/jump2.wav")
         self.game_over = arcade.load_sound(":resources:sounds/gameover1.wav")
+        self.button_activated = arcade.load_sound(":resources:sounds/hit3.wav")
+        self.backgrounds = arcade.SpriteList()
 
         # Camera
         self.camera = None
@@ -80,12 +113,36 @@ class MyGame(arcade.View):
         self.setup()
 
     def setup(self):
+
+        images = ("./risorse/sfondi/layers_fullcolor/sky.png",
+                  "./risorse/sfondi/layers_fullcolor/far_mountains_fc.png",
+                  "./risorse/sfondi/layers_fullcolor/grassy_mountains_fc.png",
+                  "./risorse/sfondi/layers_fullcolor/clouds_mid_t_fc.png",
+                  "./risorse/sfondi/layers_fullcolor/clouds_mid_fc.png",
+                  "./risorse/sfondi/layers_fullcolor/clouds_front_fc.png",
+                  "./risorse/sfondi/layers_fullcolor/clouds_front_t_fc.png")
+
+        rise = BACKGROUND_RISE_AMOUNT * SPRITE_SCALING
+
+        for count, image in enumerate(images):
+            bottom = rise * (len(images) - count - 1) 
+
+            sprite = arcade.Sprite(image, scale=SPRITE_SCALING)
+            sprite.bottom = bottom 
+            sprite.left = 0
+            self.backgrounds.append(sprite)
+
+            sprite = arcade.Sprite(image, scale=SPRITE_SCALING)
+            sprite.bottom = bottom 
+            sprite.left = sprite.width
+            self.backgrounds.append(sprite)
+
         """Set up the game here. Call this function to restart the game."""
         # Set up scene
         self.scene = arcade.Scene()
 
-        level1_sound = arcade.load_sound("./risorse/music/invitation.ogg")
-        arcade.play_sound(level1_sound, looping=True)
+        self.level1_sound = arcade.load_sound("./risorse/music/invitation.ogg")
+        self.player_sound = arcade.play_sound(self.level1_sound, looping=True)
 
         # Set up camera
         self.camera = arcade.Camera(self.window.width, self.window.height)
@@ -141,64 +198,38 @@ class MyGame(arcade.View):
         # end of the order.
         self.scene.add_sprite_list_after("Player", LAYER_NAME_FOREGROUND)
 
-        # Set up the player, specifically placing it at these coordinates.
-        self.player_sprite = PlayerCharacter(character="frog",
-                                             keymap_conf="keyboard1",
-                                             center_x=64,
-                                             center_y=128,
-                                             platforms=self.scene[LAYER_NAME_MOVING_PLATFORMS],
-                                             gravity_constant=GRAVITY,
-                                             ladders=self.scene[LAYER_NAME_LADDERS],
-                                             walls=self.scene[LAYER_NAME_PLATFORMS])
-        self.scene.add_sprite("Player", self.player_sprite)
-
-        # Per usare Player2 con WASD basta cambiare PlayerCharacterJoy con PlayerCharacter.
-        # In pratica, il parametro keymap_conf="keyboard2" determina il mapping dei tasti per
-        # il player che si sta creando. Guarda dentro file PlayerCharacter.py il dizionario 'keymap'
-        f = open("input_conf.txt", "r")
-        line = f.readline()
-
-        if line == "joypad":
-            self.player_sprite2 = PlayerCharacterJoy(character="masked",
-                                                 keymap_conf="keyboard2",
-                                                 center_x=64,
-                                                 center_y=128,
-                                                 platforms=self.scene[LAYER_NAME_MOVING_PLATFORMS],
-                                                 gravity_constant=GRAVITY,
-                                                 ladders=self.scene[LAYER_NAME_LADDERS],
-                                                 walls=self.scene[LAYER_NAME_PLATFORMS])
-            self.scene.add_sprite("Player", self.player_sprite2)
-        else:
-            self.player_sprite2 = PlayerCharacter(character="masked",
-                                                     keymap_conf="keyboard2",
-                                                     center_x=64,
-                                                     center_y=128,
-                                                     platforms=self.scene[LAYER_NAME_MOVING_PLATFORMS],
-                                                     gravity_constant=GRAVITY,
-                                                     ladders=self.scene[LAYER_NAME_LADDERS],
-                                                     walls=self.scene[LAYER_NAME_PLATFORMS])
-            self.scene.add_sprite("Player", self.player_sprite2)
-
         # --- Other stuff
         # Set the background color
         if self.tile_map.background_color:
             arcade.set_background_color(self.tile_map.background_color)
 
-    def on_key_press(self, key: int, modifiers: int):
-        """ Called whenever a key is pressed """
-        self.player_sprite.notify_keypress(key)
-        self.player_sprite2.notify_keypress(key)
+    def start_listening(self):
+        if self.fresh_start:
+            self.start()
+            self.fresh_start = False
+            self.set_subscriber_topic(self.subtopic)
+            print(f"Sottoscritto a {self.subtopic}")
 
-    def on_key_release(self, key, modifiers):
-        """Called when the user releases a key."""
-        self.player_sprite.notify_keyrelease(key)
-        self.player_sprite2.notify_keyrelease(key)
+    def check_restart_player(self, player_sprite: PlayerCharacter):
+        # Did the player fall off the map?
+        if player_sprite.center_y < -100:
+            player_sprite.respawn()
+            arcade.play_sound(self.game_over)
+
+        # Did the player touch something they should not?
+        if arcade.check_for_collision_with_list(player_sprite, self.scene[LAYER_NAME_DONT_TOUCH], method=1):
+            player_sprite.respawn()
+            arcade.play_sound(self.game_over)
+
+
+    def run(self):
+        self.receive_loop()
 
     def check_coin_collision(self, player_sprite: arcade.Sprite, score: int):
         coin_hit_list = arcade.check_for_collision_with_list(player_sprite, self.scene["gettoni"])
-        
+
         # Loop through each coin we hit (if any) and remove it
-        for coin in coin_hit_list:
+        for count, coin in enumerate(coin_hit_list):
             # Remove the coin
             coin.remove_from_sprite_lists()
             # Play a sound
@@ -206,88 +237,42 @@ class MyGame(arcade.View):
             score += 1
         return score
 
-    def check_restart_player(self, player_sprite, player_sprite2):
-        # Did the player fall off the map?
-        if player_sprite.center_y < -100:
-            player_sprite.center_x = player_sprite2.center_x
-            player_sprite.center_y = player_sprite2.center_y
-            arcade.play_sound(self.game_over)
-        if player_sprite2.center_y < -100:
-            player_sprite2.center_x = player_sprite.center_x
-            player_sprite2.center_y = player_sprite.center_y
-            arcade.play_sound(self.game_over)
+    def check_checkpoint_collision(self, player_sprite: PlayerCharacter):
+        checkpoint = arcade.check_for_collision_with_list(player_sprite, self.scene["checkpoint"])
 
-        # Did the player touch something they should not?
-        if arcade.check_for_collision_with_list(player_sprite, self.scene[LAYER_NAME_DONT_TOUCH], method=1):
-            player_sprite.center_x = player_sprite2.center_x - 20
-            player_sprite.center_y = player_sprite2.center_y
-            arcade.play_sound(self.game_over)
+        for flag in checkpoint:
+            self.flag = flag
 
-        if arcade.check_for_collision_with_list(player_sprite2, self.scene[LAYER_NAME_DONT_TOUCH], method=1):
-            player_sprite2.center_x = player_sprite.center_x - 20
-            player_sprite2.center_y = player_sprite.center_y
-            arcade.play_sound(self.game_over)
+        if checkpoint:
+            player_sprite.update_checkpoint(player_sprite.center_x, player_sprite.center_y)
 
-    def on_update(self, delta_time: float):
-        """Movement and game logic"""
-
-        # Position the camera
-        self.center_camera_to_player()
-
-        self.player_sprite.update_character()
-        self.player_sprite2.update_character()
-
-        self.score_player1 = self.check_coin_collision(self.player_sprite, self.score_player1)
-        self.score_player2 = self.check_coin_collision(self.player_sprite2, self.score_player2)
-
-        self.check_restart_player(self.player_sprite, self.player_sprite2)
-
-        # Update walls, used with moving platforms
-        self.scene.update([LAYER_NAME_MOVING_PLATFORMS])
-
-        # Switch to the next level
-        if len(self.scene["gettoni"]) == 0:
-            # Advance to the next level
-            self.level += 1
-
-            # Make sure to keep the score from this level when setting up the next level
-            self.reset_score = False
-
-            # Load the next level
-            self.setup()
-
-    def center_camera_to_player(self):
-        screen_center_x = self.player_sprite.center_x - (self.camera.viewport_width / 2)
-        screen_center_y = self.player_sprite.center_y - (self.camera.viewport_height / 2)
+    def center_camera_to_player(self, player_sprite: PlayerCharacter):
+        screen_center_x = player_sprite.center_x - (self.camera.viewport_width / 2)
+        screen_center_y = player_sprite.center_y - (self.camera.viewport_height / 2)
 
         # Don't let camera travel past 0 and players
         if screen_center_x < 0:
             screen_center_x = 0
         if screen_center_y < 0:
             screen_center_y = 0
-        if screen_center_x > (self.player_sprite2.center_x - self.player_sprite2.width/2):
-            screen_center_x = (self.player_sprite2.center_x - self.player_sprite2.width/2) 
 
-        if (self.camera.position[0] + self.camera.viewport_width <
-                (self.player_sprite.center_x + self.player_sprite.width/2)):
-            if self.player_sprite.change_x > 0: 
-                self.player_sprite.change_x = 0
-            if self.player_sprite2.change_x < 0:
-                self.player_sprite2.change_x = 0
-        if self.camera.position[0] > (self.player_sprite.center_x - self.player_sprite.width/2):
-            if self.player_sprite.change_x < 0: 
-                self.player_sprite.change_x = 0
-        if (self.camera.position[0] + self.camera.viewport_width <
-                (self.player_sprite2.center_x + self.player_sprite2.width/2)):
-            if self.player_sprite2.change_x > 0:
-                self.player_sprite2.change_x = 0
-        if (self.camera.position[0] >
-                (self.player_sprite2.center_x - self.player_sprite2.width/2 + PLAYER_MOVEMENT_SPEED)):
-            if self.player_sprite2.change_x < 0:
-                self.player_sprite2.change_x = 0
-
+        if screen_center_x > self.tile_map.width*18:
+            screen_center_x = self.tile_map.width*18
+        
         player_centered = screen_center_x, screen_center_y
         self.camera.move_to(player_centered)
+
+        # Update background to camera
+        camera_x = self.camera.position[0]
+        camera_y = self.camera.position[1]
+        for count, sprite in enumerate(self.backgrounds):
+            layer = count // 2
+            frame = count % 2
+            offset = camera_x / (2 ** (layer + 1))
+            jump = (camera_x - offset) // sprite.width
+            final_offset = offset + (jump + frame) * sprite.width
+            sprite.left = final_offset
+            sprite.bottom = camera_y
 
     def on_draw(self):
         """Render the screen."""
@@ -295,8 +280,11 @@ class MyGame(arcade.View):
         # Clear the screen to the background color
         self.clear()
 
+
         # Camera activation
         self.camera.use()
+
+        self.backgrounds.draw(pixelated=True)
 
         # Draw all sprite lists in the scene
         self.scene.draw()
@@ -322,6 +310,277 @@ class MyGame(arcade.View):
             arcade.csscolor.WHITE,
             18,
         )
+
+
+    def animate_world(self):
+        # Update flag animation
+        if self.flag != None and self.counter == 0:
+            if self.flag_anim:
+                self.flag.texture = self.tile_map._create_sprite_from_tile(self.tile_map._get_tile_by_gid(112)).texture
+                self.flag_anim = False
+            else:
+                self.flag.texture = self.tile_map._create_sprite_from_tile(self.tile_map._get_tile_by_gid(113)).texture
+                self.flag_anim = True
+
+        # Update coin animation
+        if self.counter == 0:
+            for coin in self.scene["gettoni"]:
+                if self.coin_anim:
+                    coin.texture = self.tile_map._create_sprite_from_tile(self.tile_map._get_tile_by_gid(152)).texture
+                else:
+                    coin.texture = self.tile_map._create_sprite_from_tile(self.tile_map._get_tile_by_gid(153)).texture
+            self.coin_anim = not self.coin_anim
+        self.counter = (self.counter + 1 ) % ANIMATION_RESET
+
+
+    def check_button_collision(self, player_sprite: arcade.Sprite):
+        button_hit_list = arcade.check_for_collision_with_list(player_sprite, self.scene["attivabili"])
+
+        for count, button in enumerate(button_hit_list):
+            button.texture = self.tile_map._create_sprite_from_tile(self.tile_map._get_tile_by_gid(108)).texture
+            arcade.play_sound(self.button_activated)
+
+
+    def check_level_switch(self):
+        # Switch to the next level
+        if len(self.scene["gettoni"]) == 0:
+            # Advance to the next level
+            self.level += 1
+
+            # stop music when a new level is generated
+            arcade.stop_sound(self.player_sound)
+
+            # start from mymenu when levels are finished
+            if self.level == MAX_LEVEL:
+                self.window.show_view(MyMenu.MyMenu())
+                return
+
+            # Make sure to keep the score from this level when setting up the next level
+            self.reset_score = False
+
+            # Load the next level
+            self.setup()
+
+
+class MyGameP1(MyGame):
+    def __init__(self):
+        super().__init__()
+
+        self.player = "P1"
+        self.topic = self.topic + "P1"
+        self.subtopic = self.subtopic + "P2"
+
+    def incoming_message_processing(self, topic, payload):
+        if self.external_message_processor:
+            self.external_message_processor(topic, payload)
+
+        self.player_sprite2.center_x = payload["x"]
+        self.player_sprite2.center_y = payload["y"]
+        self.player_sprite2.change_x = payload["change_x"]
+        self.player_sprite2.change_y = payload["change_y"]
+
+    def setup(self):
+        super().setup()
+
+        kwargs = {
+            "center_x": STARTING_X,
+            "center_y": STARTING_Y,
+            "platforms": self.scene[LAYER_NAME_MOVING_PLATFORMS],
+            "gravity_constant": GRAVITY,
+            "ladders": self.scene[LAYER_NAME_LADDERS],
+            "walls": self.scene[LAYER_NAME_PLATFORMS]
+        }
+
+        if self.json_conf["controls"] == "joypad\n":
+            self.player_sprite = PlayerCharacterJoy(character="frog",
+                                                    keymap_conf="keyboard1",
+                                                    **kwargs)
+            self.scene.add_sprite("Player", self.player_sprite)
+        else:
+            self.player_sprite = PlayerCharacter(character="frog",
+                                                 keymap_conf="keyboard1",
+                                                 **kwargs)
+            self.scene.add_sprite("Player", self.player_sprite)
+
+        self.player_sprite2 = PlayerCharacter(character="masked",
+                                              keymap_conf="keyboard2",
+                                              **kwargs)
+        self.scene.add_sprite("Player", self.player_sprite2)
+
+        self.start_listening()
+
+    def on_key_press(self, key: int, modifiers: int):
+        """ Called whenever a key is pressed """
+        self.player_sprite.notify_keypress(key)
+
+        if key == arcade.key.ESCAPE:
+            arcade.stop_sound(self.player_sound)
+            self.clean_up()
+            self.window.show_view(MyMenu.MyMenu())
+
+    def on_key_release(self, key, modifiers):
+        """Called when the user releases a key."""
+        self.player_sprite.notify_keyrelease(key)
+
+    def check_button_collision(self, player_sprite: arcade.Sprite):
+        button_hit_list = arcade.check_for_collision_with_list(player_sprite, self.scene["attivabili"])
+
+        for count, button in enumerate(button_hit_list):
+            button.texture = self.tile_map._create_sprite_from_tile(self.tile_map._get_tile_by_gid(108)).texture
+            arcade.play_sound(self.button_activated)
+
+            piattaforma = button.properties["piattaforma"]
+            for platform in self.scene["piattaforme"]:
+                if platform.properties["attivabile"] == piattaforma:
+                    if platform.properties["moving"] == 1:
+                        platform.change_y = 0.5
+                    elif platform.properties["moving"] == 0:
+                        platform.change_x = 0.5
+                    self.scene["attivabili"].remove(button)
+                    self.scene["foreground"].append(button)
+
+    def on_update(self, delta_time: float):
+        """Movement and game logic"""
+
+        self.player_sprite.update_character()
+        self.player_sprite2.update_animation()
+
+        # Position the camera
+        self.center_camera_to_player(self.player_sprite)
+
+        self.score_player1 = self.check_coin_collision(self.player_sprite, self.score_player1)
+        self.score_player2 = self.check_coin_collision(self.player_sprite2, self.score_player2)
+        self.check_button_collision(self.player_sprite)
+        self.check_button_collision(self.player_sprite2)
+        self.check_checkpoint_collision(self.player_sprite)
+        self.check_restart_player(self.player_sprite)
+        
+        self.animate_world()
+
+        # Update walls, used with moving platforms
+        self.scene.update([LAYER_NAME_MOVING_PLATFORMS])
+
+        # Publish player and world updates
+        payload = {
+            "x": self.player_sprite.center_x,
+            "y": self.player_sprite.center_y,
+            "change_x": self.player_sprite.change_x,
+            "change_y": self.player_sprite.change_y
+        }
+    
+        self.publish_payload(payload, self.topic)
+
+        for count, platform in enumerate(self.scene["piattaforme"]):
+            self.publish_payload({"idx": count, "c_x": platform.center_x, "c_y": platform.center_y}, self.platform_topic)
+
+        self.check_level_switch()
+
+
+class MyGameP2(MyGame):
+    def __init__(self):
+        super().__init__()
+
+        self.player = "P2"
+        self.topic = self.topic + "P2"
+        self.subtopic = self.subtopic + "P1"
+
+        self.button_idx = None
+
+    def incoming_message_processing(self, topic, payload):
+        if self.external_message_processor:
+            self.external_message_processor(topic, payload)
+
+        if topic == self.subtopic:
+            self.player_sprite.center_x = payload["x"]
+            self.player_sprite.center_y = payload["y"]
+            self.player_sprite.change_x = payload["change_x"]
+            self.player_sprite.change_y = payload["change_y"]
+        elif topic == self.platform_topic:
+            idx = payload["idx"]
+            self.scene["piattaforme"][idx].center_x = payload["c_x"]
+            self.scene["piattaforme"][idx].center_y = payload["c_y"]
+
+    def setup(self):
+        super().setup()
+
+        kwargs = {
+            "center_x": STARTING_X,
+            "center_y": STARTING_Y,
+            "platforms": self.scene[LAYER_NAME_MOVING_PLATFORMS],
+            "gravity_constant": GRAVITY,
+            "ladders": self.scene[LAYER_NAME_LADDERS],
+            "walls": self.scene[LAYER_NAME_PLATFORMS]
+        }
+
+        if self.json_conf["controls"] == "joypad\n":
+            self.player_sprite2 = PlayerCharacterJoy(character="masked",
+                                                     keymap_conf="keyboard1",
+                                                     **kwargs)
+            self.scene.add_sprite("Player", self.player_sprite2)
+        else:
+            self.player_sprite2 = PlayerCharacter(character="masked",
+                                                  keymap_conf="keyboard1",
+                                                  **kwargs)
+            self.scene.add_sprite("Player", self.player_sprite2)
+
+        print("init player object")
+
+        self.player_sprite = PlayerCharacter(character="frog",
+                                             keymap_conf="keyboard2",
+                                             **kwargs)
+        self.scene.add_sprite("Player", self.player_sprite)
+
+        if self.fresh_start:
+            self.set_subscriber_topic(self.platform_topic)
+        self.start_listening()
+
+
+    def on_key_press(self, key: int, modifiers: int):
+        """ Called whenever a key is pressed """
+        self.player_sprite2.notify_keypress(key)
+
+        if key == arcade.key.ESCAPE:
+            arcade.stop_sound(self.player_sound)
+            self.clean_up()
+            self.window.show_view(MyMenu.MyMenu())
+
+
+    def on_key_release(self, key, modifiers):
+        """Called when the user releases a key."""
+        self.player_sprite2.notify_keyrelease(key)
+
+
+    def on_update(self, delta_time: float):
+        """Movement and game logic"""
+
+        self.player_sprite.update_animation()
+        self.player_sprite2.update_character()
+
+        # Position the camera
+        self.center_camera_to_player(self.player_sprite2)
+
+        self.score_player1 = self.check_coin_collision(self.player_sprite, self.score_player1)
+        self.score_player2 = self.check_coin_collision(self.player_sprite2, self.score_player2)
+        self.check_button_collision(self.player_sprite)
+        self.check_button_collision(self.player_sprite2)
+        self.check_checkpoint_collision(self.player_sprite2)
+
+        self.animate_world()
+
+        self.check_restart_player(self.player_sprite2)
+
+        # Update walls, used with moving platforms
+        self.scene.update([LAYER_NAME_MOVING_PLATFORMS])
+        
+        payload = {
+            "x": self.player_sprite2.center_x,
+            "y": self.player_sprite2.center_y,
+            "change_x": self.player_sprite2.change_x,
+            "change_y": self.player_sprite2.change_y
+        }
+        self.publish_payload(payload, self.topic)
+
+        self.check_level_switch()
 
 
 def main():
