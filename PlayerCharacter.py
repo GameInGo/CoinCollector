@@ -1,6 +1,8 @@
 import arcade
 import pyglet
 
+import time
+
 # Disable xinput controllers otherwise joystick is recognized
 # as input device
 pyglet.options["xinput_controllers"] = False
@@ -30,6 +32,9 @@ anim_dict = {
     },
     "fall": {
         "max_frame": 1
+    },
+    "hit": {
+        "max_frame": 7
     }
 }
 
@@ -73,6 +78,10 @@ class PlayerCharacter(arcade.Sprite):
         self.center_x = center_x
         self.center_y = center_y
 
+        self.isHit = False
+        self.lives = 2
+        self.last_touch = 0
+
         self.curr_anim = "idle"
 
         self.physics_engine = arcade.PhysicsEnginePlatformer(self, platforms, gravity_constant, ladders, walls)
@@ -96,6 +105,7 @@ class PlayerCharacter(arcade.Sprite):
         double_jump = f"{character}_double_jump/{character}_double_jump"
         jump = f"{character}_jump/{character}_jump"
         fall = f"{character}_fall/{character}_fall"
+        hit = f"{character}_hit/{character}_hit"
 
         self.anim_texture_map = {}
 
@@ -118,6 +128,9 @@ class PlayerCharacter(arcade.Sprite):
         # Load textures for falling
         self.fall = []
         self.add_animation(main_path, fall, "fall", self.fall)
+
+        self.hit = []
+        self.add_animation(main_path, hit, "hit", self.hit)
 
         self.anim_texture = self.idle_texture_pair
 
@@ -156,20 +169,23 @@ class PlayerCharacter(arcade.Sprite):
     def notify_keyrelease(self, released_key):
         if released_key == keymap[self.keymap_conf]["up"] and self.physics_engine.is_on_ladder():
             self.change_y = 0
-        if released_key == keymap[self.keymap_conf]["left"]:
-            self.change_x = 0
-        elif released_key == keymap[self.keymap_conf]["right"]:
+        if (released_key == keymap[self.keymap_conf]["left"] or
+            released_key == keymap[self.keymap_conf]["right"]):
             self.change_x = 0
 
     def can_jump(self):
         return self.physics_engine.can_jump()
 
     def update_character(self):
+        self.update_health()
         self.update_animation()
         self.update_physics()
 
     def update_physics(self):
         self.physics_engine.update()
+
+    def update_health(self):
+        self.isHit = time.perf_counter() - self.last_touch <= 1
 
     def update_animation(self, delta_time: float = 1 / 60):
 
@@ -182,16 +198,18 @@ class PlayerCharacter(arcade.Sprite):
         direction = self.character_face_direction
 
         # Change current animation to desired one
-        if self.change_x == 0 and self.change_y == 0:
-            self.change_animation("idle")
-        elif self.change_x != 0 and self.change_y == 0:
-            self.change_animation("run")
-        elif self.change_y > 0 and self.physics_engine.jumps_since_ground == 1 and not self.physics_engine.is_on_ladder():
-            self.change_animation("jump")
-        elif self.change_y > 0 and self.physics_engine.jumps_since_ground == 2 and not self.physics_engine.is_on_ladder():
-            self.change_animation("djump")
-        elif self.change_y < 0:
-            self.change_animation("fall")
+        if not self.isHit:
+            print("is not hit")
+            if self.change_x == 0 and self.change_y == 0:
+                self.change_animation("idle")
+            elif self.change_x != 0 and self.change_y == 0:
+                self.change_animation("run")
+            elif self.change_y > 0 and self.physics_engine.jumps_since_ground == 1 and not self.physics_engine.is_on_ladder():
+                self.change_animation("jump")
+            elif self.change_y > 0 and self.physics_engine.jumps_since_ground == 2 and not self.physics_engine.is_on_ladder():
+                self.change_animation("djump")
+            elif self.change_y < 0:
+                self.change_animation("fall")
 
         # Rationale: we update an image frame every UPDATES_PER_FRAME times the update_animation is called
         #            the lower the UPDATES_PER_FRAME value, the faster the animation

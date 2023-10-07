@@ -8,6 +8,8 @@ import arcade
 import arcade.gui
 from python_banyan.banyan_base import BanyanBase
 
+import time
+
 from PlayerCharacter import PlayerCharacter, PlayerCharacterJoy
 import MyMenu
 
@@ -20,6 +22,8 @@ STARTING_Y = 128
 SPRITE_SCALING = 2.5
 BACKGROUND_RISE_AMOUNT = 30
 MAX_LEVEL = 3
+
+DMG_TIMEOUT = 1
 
 # Constants used to scale our sprites from their original size
 TILE_SCALING = 1.3
@@ -106,6 +110,8 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
         # Do we need to reset the score?
         self.reset_score = True
         self.reset_score2 = True
+
+        arcade.load_font("./risorse/font/reg.ttf")
 
         arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
 
@@ -211,15 +217,28 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
             print(f"Sottoscritto a {self.subtopic}")
 
     def check_restart_player(self, player_sprite: PlayerCharacter):
+        to_respawn = False
         # Did the player fall off the map?
         if player_sprite.center_y < -100:
+            player_sprite.lives = 2
             player_sprite.respawn()
             arcade.play_sound(self.game_over)
-
-        # Did the player touch something they should not?
+            return
+            
         if arcade.check_for_collision_with_list(player_sprite, self.scene[LAYER_NAME_DONT_TOUCH], method=1):
-            player_sprite.respawn()
-            arcade.play_sound(self.game_over)
+            to_respawn = True
+
+        if time.perf_counter() - player_sprite.last_touch > DMG_TIMEOUT:
+            if to_respawn:
+                player_sprite.last_touch = time.perf_counter()
+                player_sprite.lives -= 1
+                player_sprite.isHit = True
+                if player_sprite.lives == 1:
+                    player_sprite.change_animation("hit")
+                if player_sprite.lives == 0:
+                    player_sprite.lives = 2
+                    player_sprite.respawn()
+                    arcade.play_sound(self.game_over)
 
 
     def run(self):
@@ -300,6 +319,7 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
             10,
             arcade.csscolor.WHITE,
             18,
+            font_name="./risorse/font/reg.ttf"
         )
 
         score_text = f"Score Player 2: {self.score_player2}"
@@ -309,6 +329,7 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
             10,
             arcade.csscolor.WHITE,
             18,
+            font_name="./risorse/font/reg.ttf"
         )
 
 
@@ -483,8 +504,6 @@ class MyGameP2(MyGame):
         self.player = "P2"
         self.topic = self.topic + "P2"
         self.subtopic = self.subtopic + "P1"
-
-        self.button_idx = None
 
     def incoming_message_processing(self, topic, payload):
         if self.external_message_processor:
