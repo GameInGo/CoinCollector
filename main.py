@@ -91,7 +91,7 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
         self.jump_sound2 = arcade.load_sound(":resources:sounds/jump2.wav")
         self.game_over = arcade.load_sound(":resources:sounds/gameover1.wav")
         self.button_activated = arcade.load_sound(":resources:sounds/hit3.wav")
-        self.backgrounds = arcade.SpriteList()
+        self.backgrounds = None
 
         # Camera
         self.camera = None
@@ -114,13 +114,23 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
 
     def setup(self):
 
-        images = ("./risorse/sfondi/layers_fullcolor/sky.png",
-                  "./risorse/sfondi/layers_fullcolor/far_mountains_fc.png",
-                  "./risorse/sfondi/layers_fullcolor/grassy_mountains_fc.png",
-                  "./risorse/sfondi/layers_fullcolor/clouds_mid_t_fc.png",
-                  "./risorse/sfondi/layers_fullcolor/clouds_mid_fc.png",
-                  "./risorse/sfondi/layers_fullcolor/clouds_front_fc.png",
-                  "./risorse/sfondi/layers_fullcolor/clouds_front_t_fc.png")
+        self.backgrounds = arcade.SpriteList()
+        if self.level == 1:
+            images = ("./risorse/sfondi/layers_fullcolor/sky.png",
+                    "./risorse/sfondi/layers_fullcolor/far_mountains_fc.png",
+                    "./risorse/sfondi/layers_fullcolor/grassy_mountains_fc.png",
+                    "./risorse/sfondi/layers_fullcolor/clouds_mid_t_fc.png",
+                    "./risorse/sfondi/layers_fullcolor/clouds_mid_fc.png",
+                    "./risorse/sfondi/layers_fullcolor/clouds_front_fc.png",
+                    "./risorse/sfondi/layers_fullcolor/clouds_front_t_fc.png")
+        else:
+            images = ("./risorse/sfondi/glacial_mountains/sky.png",
+                      "./risorse/sfondi/glacial_mountains/glacial_mountains_lightened.png",
+                      "./risorse/sfondi/glacial_mountains/clouds_bg.png"
+                      "./risorse/sfondi/glacial_mountains/glacial_clouds_mg_3.png",
+                      "./risorse/sfondi/glacial_mountains/clouds_mg_2.png",
+                      "./risorse/sfondi/glacial_mountains/clouds_mg_1_lightened.png",
+                      "./risorse/sfondi/glacial_mountains/cloud_lonely.png")
 
         rise = BACKGROUND_RISE_AMOUNT * SPRITE_SCALING
 
@@ -154,7 +164,7 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
         self.gui_camera = arcade.Camera(self.window.width, self.window.height)
 
         # Map name
-        map_name = f"./risorse/maps/livello{self.level}.json"
+        map_name = f"./risorse/maps/livello{self.level +1}.json"
 
         # Layer Specific Options for the Tilemap
         layer_options = {
