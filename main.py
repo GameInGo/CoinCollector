@@ -22,6 +22,8 @@ STARTING_Y = 128
 SPRITE_SCALING = 2.5
 BACKGROUND_RISE_AMOUNT = 30
 MAX_LEVEL = 3
+FONT_NAME = "Pixelify Sans"
+FONT_FILE = "pixelify.ttf"
 
 DMG_TIMEOUT = 1
 
@@ -52,6 +54,8 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
     Main application class.
     """
     def __init__(self):
+
+        self.custom_font = arcade.load_font(f"./risorse/font/{FONT_FILE}")
 
         self.event = threading.Event()
 
@@ -325,7 +329,8 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
                 10,
                 10,
                 arcade.csscolor.WHITE,
-                18
+                18,
+                font_name=FONT_NAME
             )
 
         if self.player == "P2" or (self.player == "P1" and self.player_connected):
@@ -335,7 +340,8 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
                 600,
                 10,
                 arcade.csscolor.WHITE,
-                18
+                18,
+                font_name=FONT_NAME
             )
 
         self.hearts_sprite.draw()

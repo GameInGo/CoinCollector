@@ -252,6 +252,7 @@ class PlayerCharacterJoy(PlayerCharacter):
             if abs(self.change_x) < 0.5:
                 self.change_x = 0
 
+        self.update_health()
         self.update_animation()
         self.update_physics()
 
