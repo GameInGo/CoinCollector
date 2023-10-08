@@ -188,7 +188,6 @@ class PlayerCharacter(arcade.Sprite):
         self.isHit = time.perf_counter() - self.last_touch <= 1
 
     def update_animation(self, delta_time: float = 1 / 60):
-
         # Figure out if we need to flip face left or right
         if self.change_x < 0 and self.character_face_direction == RIGHT_FACING:
             self.character_face_direction = LEFT_FACING
@@ -199,7 +198,6 @@ class PlayerCharacter(arcade.Sprite):
 
         # Change current animation to desired one
         if not self.isHit:
-            print("is not hit")
             if self.change_x == 0 and self.change_y == 0:
                 self.change_animation("idle")
             elif self.change_x != 0 and self.change_y == 0:

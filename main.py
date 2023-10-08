@@ -86,6 +86,8 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
         self.player_sprite = None
         self.player_sprite2 = None
         self.hearts_sprite = None
+        self.player_connected = False
+        self.player_added = False
 
         # Level
         self.level = 1
@@ -225,7 +227,7 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
         # Did the player fall off the map?
         if player_sprite.center_y < -100:
             player_sprite.lives = 2
-            self.update_hearts()
+            self.update_hearts(player_sprite)
             player_sprite.respawn()
             arcade.play_sound(self.game_over)
             return
@@ -245,7 +247,7 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
                     player_sprite.respawn()
                     arcade.play_sound(self.game_over)
 
-        self.update_hearts()
+        self.update_hearts(player_sprite)
 
 
     def run(self):
@@ -300,29 +302,31 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
             sprite.left = final_offset
             sprite.bottom = camera_y
 
-    def update_hearts(self):
-        heart_id = 45 if self.player_sprite.lives == 2 else 46
+    def update_hearts(self, player_sprite):
+        heart_id = 45 if player_sprite.lives == 2 else 46
         self.hearts_sprite.texture = self.tile_map._create_sprite_from_tile(self.tile_map._get_tile_by_gid(heart_id)).texture
 
     def draw_interface(self):
-        # Draw our score on the screen, scrolling it with the viewport
-        score_text = f"Score Player 1: {self.score_player1}"
-        arcade.draw_text(
-            score_text,
-            10,
-            10,
-            arcade.csscolor.WHITE,
-            18
-        )
+        if self.player == "P1" or (self.player == "P2" and self.player_connected):
+            # Draw our score on the screen, scrolling it with the viewport
+            score_text = f"Score Player 1: {self.score_player1}"
+            arcade.draw_text(
+                score_text,
+                10,
+                10,
+                arcade.csscolor.WHITE,
+                18
+            )
 
-        score_text = f"Score Player 2: {self.score_player2}"
-        arcade.draw_text(
-            score_text,
-            600,
-            10,
-            arcade.csscolor.WHITE,
-            18
-        )
+        if self.player == "P2" or (self.player == "P1" and self.player_connected):
+            score_text = f"Score Player 2: {self.score_player2}"
+            arcade.draw_text(
+                score_text,
+                600,
+                10,
+                arcade.csscolor.WHITE,
+                18
+            )
 
         self.hearts_sprite.draw()
         
@@ -376,6 +380,9 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
             button.texture = self.tile_map._create_sprite_from_tile(self.tile_map._get_tile_by_gid(108)).texture
             arcade.play_sound(self.button_activated)
 
+            self.scene["attivabili"].remove(button)
+            self.scene["foreground"].append(button)
+
 
     def check_level_switch(self):
         # Switch to the next level
@@ -407,6 +414,9 @@ class MyGameP1(MyGame):
         self.subtopic = self.subtopic + "P2"
 
     def incoming_message_processing(self, topic, payload):
+        if not self.player_connected:
+            self.player_connected = True
+
         if self.external_message_processor:
             self.external_message_processor(topic, payload)
 
@@ -430,7 +440,6 @@ class MyGameP1(MyGame):
         self.player_sprite2 = PlayerCharacter(character="masked",
                                               keymap_conf="keyboard2",
                                               **kwargs)
-        self.scene.add_sprite("Player", self.player_sprite2)
 
         if self.json_conf["controls"] == "joypad\n":
             self.player_sprite = PlayerCharacterJoy(character="frog",
@@ -480,6 +489,10 @@ class MyGameP1(MyGame):
     def on_update(self, delta_time: float):
         """Movement and game logic"""
 
+        if self.player_connected and not self.player_added:
+            self.scene.add_sprite("Player", self.player_sprite2)
+            self.player_added = True
+
         self.player_sprite.update_character()
         self.player_sprite2.update_animation()
 
@@ -523,6 +536,9 @@ class MyGameP2(MyGame):
         self.subtopic = self.subtopic + "P1"
 
     def incoming_message_processing(self, topic, payload):
+        if not self.player_connected:
+            self.player_connected = True
+
         if self.external_message_processor:
             self.external_message_processor(topic, payload)
 
@@ -551,7 +567,6 @@ class MyGameP2(MyGame):
         self.player_sprite = PlayerCharacter(character="frog",
                                              keymap_conf="keyboard2",
                                              **kwargs)
-        self.scene.add_sprite("Player", self.player_sprite)
 
         if self.json_conf["controls"] == "joypad\n":
             self.player_sprite2 = PlayerCharacterJoy(character="masked",
@@ -589,6 +604,10 @@ class MyGameP2(MyGame):
     def on_update(self, delta_time: float):
         """Movement and game logic"""
 
+        if self.player_connected and not self.player_added:
+            self.scene.add_sprite("Player", self.player_sprite)
+            self.player_added = True
+
         self.player_sprite.update_animation()
         self.player_sprite2.update_character()
 
@@ -600,10 +619,10 @@ class MyGameP2(MyGame):
         self.check_button_collision(self.player_sprite)
         self.check_button_collision(self.player_sprite2)
         self.check_checkpoint_collision(self.player_sprite2)
+        self.check_restart_player(self.player_sprite2)
 
         self.animate_world()
 
-        self.check_restart_player(self.player_sprite2)
 
         # Update walls, used with moving platforms
         self.scene.update([LAYER_NAME_MOVING_PLATFORMS])
