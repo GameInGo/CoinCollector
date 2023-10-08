@@ -94,7 +94,7 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
         self.player_added = False
 
         # Level
-        self.level = 1
+        self.level = 2
 
         # Load sounds
         self.collect_coin_sound = arcade.load_sound(":resources:sounds/coin1.wav")
