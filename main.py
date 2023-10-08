@@ -112,8 +112,6 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
         self.reset_score = True
         self.reset_score2 = True
 
-        arcade.load_font("./risorse/font/reg.ttf")
-
         arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
 
     def on_show_view(self):
@@ -314,8 +312,7 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
             10,
             10,
             arcade.csscolor.WHITE,
-            18,
-            font_name="./risorse/font/reg.ttf"
+            18
         )
 
         score_text = f"Score Player 2: {self.score_player2}"
@@ -324,12 +321,10 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
             600,
             10,
             arcade.csscolor.WHITE,
-            18,
-            font_name="./risorse/font/reg.ttf"
+            18
         )
 
         self.hearts_sprite.draw()
-
         
 
     def on_draw(self):
