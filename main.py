@@ -132,11 +132,11 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
                     "./risorse/sfondi/layers_fullcolor/clouds_front_t_fc.png")
         else:
             images = ("./risorse/sfondi/glacial_mountains/sky.png",
-                      "./risorse/sfondi/glacial_mountains/glacial_mountains_lightened.png",
-                      "./risorse/sfondi/glacial_mountains/clouds_bg.png"
-                      "./risorse/sfondi/glacial_mountains/glacial_clouds_mg_3.png",
+                      "./risorse/sfondi/glacial_mountains/clouds_bg.png",
+                      "./risorse/sfondi/glacial_mountains/glacial_mountains.png",
+                      "./risorse/sfondi/glacial_mountains/clouds_mg_3.png",
                       "./risorse/sfondi/glacial_mountains/clouds_mg_2.png",
-                      "./risorse/sfondi/glacial_mountains/clouds_mg_1_lightened.png",
+                      "./risorse/sfondi/glacial_mountains/clouds_mg_1.png",
                       "./risorse/sfondi/glacial_mountains/cloud_lonely.png")
 
         rise = BACKGROUND_RISE_AMOUNT * SPRITE_SCALING
@@ -171,7 +171,7 @@ class MyGame(arcade.View, threading.Thread, BanyanBase):
         self.gui_camera = arcade.Camera(self.window.width, self.window.height)
 
         # Map name
-        map_name = f"./risorse/maps/livello{self.level +1}.json"
+        map_name = f"./risorse/maps/livello{self.level}.json"
 
         # Layer Specific Options for the Tilemap
         layer_options = {
